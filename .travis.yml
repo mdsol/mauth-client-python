@@ -1,0 +1,16 @@
+language: python
+python:
+  - "3.6"
+# command to install dependencies
+install: "python setup.py install"
+# command to run tests
+script: "python setup.py test"
+# Automated Deployment to Artifactory
+deploy:
+  provider: pypi
+  user: $ARTIFACTORY_USERNAME # Both the Artifactory username and password are stored in Travis CI Environment Variables
+  password: $ARTIFACTORY_PASSWORD
+  server: https://mdsol.jfrog.io/mdsol/api/pypi/pypi-local
+  on:
+    tags: true
+  distributions: sdist bdist_wheel
