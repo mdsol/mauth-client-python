@@ -44,12 +44,12 @@ class KeyHolder(object):
         if not cls._MAUTH_URL:
             cls._MAUTH_URL = os.environ['MAUTH_URL']
 
-        url = f'{cls._MAUTH_URL}/mauth/v1/security_tokens/{app_uuid}.json'
+        url = '{}/mauth/v1/security_tokens/{}.json'.format(cls._MAUTH_URL, app_uuid)
         response = cls._request_session().get(url, auth=cls._MAUTH, headers=create_x_b3_headers(trace_id))
         if response.status_code == 200:
             return response.json().get('security_token').get('public_key_str'), response.headers.get('Cache-Control')
         else:
-            raise InauthenticError(f'Failed to fetch the public key for {app_uuid} from {cls._MAUTH_URL}')
+            raise InauthenticError('Failed to fetch the public key for {} from {}'.format(app_uuid, cls._MAUTH_URL))
 
     @classmethod
     def _request_session(cls):

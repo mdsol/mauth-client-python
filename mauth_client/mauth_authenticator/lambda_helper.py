@@ -2,7 +2,7 @@ import codecs
 import os
 from base64 import b64decode
 import boto3
-from requests_mauth import MAuth
+from mauth_client.requests_mauth import MAuth
 
 
 def generate_mauth():

@@ -13,7 +13,7 @@ from tests.mauth_authenticator.common import load_key
 APP_UUID = 'f5af50b2-bf7d-4c29-81db-76d086d4808a'
 TRACE_ID = '0b99e6a00834848b'
 MAUTH_URL = 'https://mauth.com'
-MAUTH_PATH = f'{MAUTH_URL}/mauth/v1/security_tokens/{APP_UUID}.json'
+MAUTH_PATH = '{}/mauth/v1/security_tokens/{}.json'.format(MAUTH_URL, APP_UUID)
 PUBLIC_KEY = load_key('rsapub')
 
 MAUTH_RESPONSE = {
@@ -69,4 +69,7 @@ class TestKeyHolder(unittest.TestCase):
             requests.get(MAUTH_PATH, status_code=404)
             with self.assertRaises(InauthenticError) as exc:
                 KeyHolder.get_public_key(APP_UUID, TRACE_ID)
-            self.assertEqual(str(exc.exception), f'Failed to fetch the public key for {APP_UUID} from {MAUTH_URL}')
+            self.assertEqual(
+                str(exc.exception),
+                'Failed to fetch the public key for {} from {}'.format(APP_UUID, MAUTH_URL)
+            )

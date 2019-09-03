@@ -22,7 +22,7 @@ SIGNATURE = 'p0SNltF6B4G5z+nVNbLv2XCEdouimo/ECQ/Sum6YM+QgE1/LZLXY+hAcwe/TkaC/2d8
             'Tl4sO0f7zU8wAYGfxLEPXvp8qgnzQ6usZwrD2ujSmXbZtksqgG1R0Vmb7LAd6P+uvtRkw8kGLz/wWwxRweSGliX/IwovGi/bMIIClDD' \
             'faUAY9QDjcU1x7i0Yy1IEyQYyCWcnL1rA=='
 
-X_MWS_AUTHENTICATION = f"MWS {APP_UUID}:{SIGNATURE}"
+X_MWS_AUTHENTICATION = "MWS {}:{}".format(APP_UUID, SIGNATURE)
 HEADERS = {'X-Mws-Time': X_MWS_TIME, 'X-Mws-Authentication': X_MWS_AUTHENTICATION}
 BODY = "こんにちはÆ"
 
@@ -208,22 +208,26 @@ class TestMauthAuthenticator(unittest.TestCase):
 
     def test_log_inauthentic_error(self):
         self.mauth_authenticator._log_authentication_error("X-MWS-Time too old")
-        self.assertEqual(self.captor.getvalue().rstrip('\n'),
-                         f'MAuth Authentication Error: App UUID: {APP_UUID}; URL: {URL}; Error: X-MWS-Time too old')
+        self.assertEqual(
+            self.captor.getvalue().rstrip('\n'),
+            'MAuth Authentication Error: App UUID: {}; URL: {}; Error: X-MWS-Time too old'.format(APP_UUID, URL)
+        )
 
     def test_log_inauthentic_error_missing_app_uuid(self):
         self.mauth_authenticator.app_uuid = ''
         self.mauth_authenticator._log_authentication_error("X-MWS-Time too old")
-        self.assertEqual(self.captor.getvalue().rstrip('\n'),
-                         f'MAuth Authentication Error: App UUID: MISSING; URL: {URL}; Error: X-MWS-Time too old')
+        self.assertEqual(
+            self.captor.getvalue().rstrip('\n'),
+            'MAuth Authentication Error: App UUID: MISSING; URL: {}; Error: X-MWS-Time too old'.format(URL)
+        )
 
     def test_log_authentication_request_info(self):
         self.mauth_authenticator._log_authentication_request()
         self.assertEqual(self.captor.getvalue().rstrip('\n'),
-                         f'MAuth Request: App UUID: {APP_UUID}; URL: {URL}')
+                         'MAuth Request: App UUID: {}; URL: {}'.format(APP_UUID, URL))
 
     def test_log_authentication_request_missing_app_uuid(self):
         self.mauth_authenticator.app_uuid = ''
         self.mauth_authenticator._log_authentication_request()
         self.assertEqual(self.captor.getvalue().rstrip('\n'),
-                         f'MAuth Request: App UUID: MISSING; URL: {URL}')
+                         'MAuth Request: App UUID: MISSING; URL: {}'.format(URL))

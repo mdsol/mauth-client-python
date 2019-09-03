@@ -1,10 +1,17 @@
 language: python
-python:
-  - "3.6"
+matrix:
+  fast_finish: true
+jobs:
+  include:
+    - python: "3.5"
+    - python: "3.6"
+    - python: "3.7"
+    - python: "pypy"
 # command to install dependencies
 install: "python setup.py install"
 # command to run tests
 script: "python setup.py test"
+
 # Automated Deployment to Artifactory
 deploy:
   provider: pypi
@@ -13,4 +20,5 @@ deploy:
   server: https://mdsol.jfrog.io/mdsol/api/pypi/pypi-local
   on:
     tags: true
+    python: 3.7
   distributions: sdist bdist_wheel
