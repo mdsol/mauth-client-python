@@ -19,6 +19,7 @@ To setup your environment:
    $ pyenv install 3.5.7
    $ pyenv install 3.6.9
    $ pyenv install 3.7.4
+   $ pyenv install pypy3.6-7.1.1
    ```
 1. Install Tox
    ```bash
@@ -26,7 +27,7 @@ To setup your environment:
    ```
 1. Setup the local project versions (one for each env in the `envlist`)
    ```bash
-    $ pyenv local 3.5.7 3.6.9 3.7.4
+    $ pyenv local 3.5.7 3.6.9 3.7.4 pypy3.6-7.1.1
    ```
 
 
@@ -37,23 +38,24 @@ To setup your environment:
 Name                                                      Stmts   Miss  Cover
 -----------------------------------------------------------------------------
 mauth_client/__init__.py                                      1      0   100%
-mauth_client/mauth_authenticator/__init__.py                  2      0   100%
+mauth_client/mauth_authenticator/__init__.py                  1      0   100%
 mauth_client/mauth_authenticator/exceptions.py                8      0   100%
 mauth_client/mauth_authenticator/key_holder.py               43      2    95%
-mauth_client/mauth_authenticator/lambda_helper.py            22     12    45%
-mauth_client/mauth_authenticator/mauth_authenticator.py      90      3    97%
+mauth_client/mauth_authenticator/lambda_helper.py            11      5    55%
+mauth_client/mauth_authenticator/mauth_authenticator.py      89      3    97%
 mauth_client/mauth_authenticator/rsa_decrypt.py              12      0   100%
 mauth_client/requests_mauth/__init__.py                       1      0   100%
-mauth_client/requests_mauth/client.py                        30      2    93%
+mauth_client/requests_mauth/client.py                        27      0   100%
 mauth_client/requests_mauth/rsa_sign.py                      27      0   100%
 -----------------------------------------------------------------------------
-TOTAL                                                       236     19    92%
+TOTAL                                                       220     10    95%
 stats run-test: commands[1] | coverage html
 _______________________________________________________________________________________ summary ________________________________________________________________________________________
   clean: commands succeeded
   py35: commands succeeded
   py36: commands succeeded
   py37: commands succeeded
+  pypy3.6-7.1.1: commands succeeded
   stats: commands succeeded
   congratulations :)
    ```
