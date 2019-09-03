@@ -66,7 +66,7 @@ MAUTH_URL       MAuth service URL (e.g. https://mauth-sandbox.imedidata.net)
 
     from mauth_client.mauth_authenticator import MAuthAuthenticator
 
-    mauth_authenticator = MAuthAuthenticator(trace_id, method, url, headers, body)
+    mauth_authenticator = MAuthAuthenticator(method, url, headers, body)
 
 3. Authenticate incoming request by calling the `is_authentic` method::
 

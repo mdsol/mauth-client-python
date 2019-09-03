@@ -12,7 +12,6 @@ from mauth_client.mauth_authenticator.exceptions import InauthenticError, Unable
 from tests.mauth_authenticator.common import load_key
 
 APP_UUID = 'f5af50b2-bf7d-4c29-81db-76d086d4808a'
-TRACE_ID = '0b99e6a00834848b'
 URL = 'https://api_gateway.com/sandbox/path'
 X_MWS_TIME = '1500854400'  # 2017-07-24 09:00:00 UTC
 MWS_DATETIME = datetime.fromtimestamp(float(X_MWS_TIME))
@@ -36,8 +35,8 @@ class TestMauthAuthenticator(unittest.TestCase):
         self.captor = StringIO()
         sys.stdout = self.captor
 
-        self.mauth_authenticator = MAuthAuthenticator(TRACE_ID, 'POST', URL, HEADERS, BODY)
-        self.mauth_authenticator_with_empty_headers = MAuthAuthenticator(TRACE_ID, 'POST', URL, {})
+        self.mauth_authenticator = MAuthAuthenticator('POST', URL, HEADERS, BODY)
+        self.mauth_authenticator_with_empty_headers = MAuthAuthenticator('POST', URL, {})
 
     def tearDown(self):
         # reset the KeyHolder.get_public_key method
@@ -197,7 +196,7 @@ class TestMauthAuthenticator(unittest.TestCase):
     @freeze_time(MWS_DATETIME)
     def test_authenticate_happy_path_lowercase_headers(self):
         headers = {'x-mws-time': X_MWS_TIME, 'x-mws-authentication': X_MWS_AUTHENTICATION}
-        authentic = MAuthAuthenticator(TRACE_ID, 'POST', URL, headers, BODY)._authenticate()
+        authentic = MAuthAuthenticator('POST', URL, headers, BODY)._authenticate()
         self.assertTrue(authentic)
 
     @freeze_time(MWS_DATETIME)

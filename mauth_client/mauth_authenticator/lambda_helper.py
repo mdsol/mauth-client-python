@@ -15,24 +15,3 @@ def generate_mauth():
                             .encode('ascii')
 
     return MAuth(app_uuid, private_key)
-
-def generate_trace_id():
-    return str(codecs.encode(os.urandom(8), 'hex_codec').decode('utf-8'))
-
-def create_x_b3_headers(trace_id):
-    return {
-        'X-B3-TraceId': trace_id,
-        'X-B3-SpanId': trace_id,
-        'X-B3-ParentSpanId': '',
-        'X-B3-Flags': '0',
-        'X-B3-Sampled': '0',
-    }
-
-def get_codebase_revision():
-    codebase_revision_path = "./codebase_revision"
-    codebase_revision = None
-    if os.path.exists(codebase_revision_path):
-        with open(codebase_revision_path, 'r') as f:
-            codebase_revision = f.readline().strip()
-
-    return codebase_revision

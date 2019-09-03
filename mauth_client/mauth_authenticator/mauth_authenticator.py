@@ -20,9 +20,8 @@ class MAuthAuthenticator(object):
     X_MWS_TIME = "x-mws-time"
     X_MWS_AUTHENTICATION = "x-mws-authentication"
 
-    def __init__(self, trace_id, method, url, headers, body=''):
+    def __init__(self, method, url, headers, body=''):
         lowercased_headers = { k.lower(): v for k, v in headers.items() }
-        self.trace_id = trace_id
         self.method = method
         self.url = url
         self.path = urlparse(url).path
@@ -111,7 +110,7 @@ class MAuthAuthenticator(object):
         return six.b(sha512(self._string_for_signing()).hexdigest())
 
     def _signature_hash(self):
-        key_text = KeyHolder.get_public_key(self.app_uuid, self.trace_id)
+        key_text = KeyHolder.get_public_key(self.app_uuid)
         if "BEGIN PUBLIC KEY" in key_text:
             # Load a PKCS#1 PEM-encoded public key
             rsakey = RSAPublicKey.load_pkcs1_openssl_pem(keyfile=key_text)

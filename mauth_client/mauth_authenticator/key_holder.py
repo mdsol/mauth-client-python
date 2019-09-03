@@ -3,7 +3,7 @@ import os
 import re
 import requests
 from requests.adapters import HTTPAdapter
-from .lambda_helper import generate_mauth, create_x_b3_headers
+from .lambda_helper import generate_mauth
 from .exceptions import InauthenticError
 
 CACHE_MAXSIZE = 128
@@ -17,15 +17,15 @@ class KeyHolder(object):
     _MAX_RETRIES = 3
 
     @classmethod
-    def get_public_key(cls, app_uuid, trace_id):
+    def get_public_key(cls, app_uuid):
         if not cls._CACHE or not app_uuid in cls._CACHE:
-            cls._set_public_key(app_uuid, trace_id)
+            cls._set_public_key(app_uuid)
 
         return cls._CACHE.get(app_uuid)
 
     @classmethod
-    def _set_public_key(cls, app_uuid, trace_id):
-        public_key, cache_control = cls._get_public_key_and_cache_control_from_mauth(app_uuid, trace_id)
+    def _set_public_key(cls, app_uuid):
+        public_key, cache_control = cls._get_public_key_and_cache_control_from_mauth(app_uuid)
         if not cls._CACHE:
             cls._CACHE = cls._create_cache(cache_control)
 
@@ -38,14 +38,14 @@ class KeyHolder(object):
         return cachetools.TTLCache(maxsize=CACHE_MAXSIZE, ttl=ttl)
 
     @classmethod
-    def _get_public_key_and_cache_control_from_mauth(cls, app_uuid, trace_id):
+    def _get_public_key_and_cache_control_from_mauth(cls, app_uuid):
         if not cls._MAUTH:
             cls._MAUTH = generate_mauth()
         if not cls._MAUTH_URL:
             cls._MAUTH_URL = os.environ['MAUTH_URL']
 
         url = '{}/mauth/v1/security_tokens/{}.json'.format(cls._MAUTH_URL, app_uuid)
-        response = cls._request_session().get(url, auth=cls._MAUTH, headers=create_x_b3_headers(trace_id))
+        response = cls._request_session().get(url, auth=cls._MAUTH)
         if response.status_code == 200:
             return response.json().get('security_token').get('public_key_str'), response.headers.get('Cache-Control')
         else:
