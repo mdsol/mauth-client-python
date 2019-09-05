@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 NAME = 'mauth_client'
 VERSION = re.search("__version__ = '([^']+)'", open(NAME + '/__init__.py').read()).group(1)
 
-INSTALL_REQUIRES = ['boto3', 'cachetools', 'requests', 'rsa']
+INSTALL_REQUIRES = ['cachetools', 'requests', 'rsa']
 
 
 setup(
@@ -36,7 +36,8 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=INSTALL_REQUIRES,
-    tests_require=['six',
+    tests_require=['boto3',
+                   'six',
                    'freezegun',
                    'python-dateutil<2.7.0,>=2.1', # botocore requires python-dateutil < 2.7.0
                    'requests-mock'],
