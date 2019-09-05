@@ -4,8 +4,7 @@ Example Usage
 Accessing an iMedidata User Endpoint
 ------------------------------------
 
-This sample shows the code to make a call to the `iMedidata API <http://developer.imedidata.com/desktop/homepage.htm>`_.
-In this case we retrieve the user details using the `Listing User Account Details <http://developer.imedidata.com/desktop/ActionTopics/Users/Listing_User_Account_Details.htm>`_ API call.
+This sample shows the code to make a call to the iMedidata API endpoint.
 
 Note the extracted method `generate_signer` for creating a MAuth Request signer using either the key text or a reference to a Private Key file.
 
@@ -50,7 +49,7 @@ Note the extracted method `generate_signer` for creating a MAuth Request signer 
 Using the API Gateway
 ---------------------
 
-In this example we use the MAuth signer to access the underlying Countries API endpoint
+In this example we use the MAuth signer to access the underlying Countries API endpoint.
 
 .. code-block:: python
 
@@ -96,7 +95,7 @@ In this example we use the MAuth signer to access the underlying Countries API e
 Authenticating Incoming Requests in AWS Lambda
 ----------------------------------------------
 
-In this example we use the lambda authenticator to authenticate incoming requests
+In this example we use the lambda authenticator to authenticate incoming requests.
 
 .. code-block:: python
 
