@@ -71,11 +71,11 @@ print(result.text)
 
 The following variables are **required** to be configured in the AWS Lambda environment variables setting:
 
-| Key            | Value                                                        |
-| -------------- | ------------------------------------------------------------ |
-| `APP_UUID`     | APP_UUID for the AWS Lambda function                         |
-| `PRIVATE_KEY`  | Encrypted private key for the APP_UUID                       |
-| `MAUTH_URL`    | MAuth service URL (e.g. https://mauth-sandbox.imedidata.net) |
+| Key            | Value                                                         |
+| -------------- | ------------------------------------------------------------- |
+| `APP_UUID`     | APP_UUID for the AWS Lambda function                          |
+| `PRIVATE_KEY`  | Encrypted private key for the APP_UUID                        |
+| `MAUTH_URL`    | MAuth service URL (e.g. https://mauth-innovate.imedidata.com) |
 
 ```python
 from mauth_client.mauth_authenticator import MAuthAuthenticator
@@ -89,11 +89,3 @@ app_uuid = mauth_authenticator.get_app_uuid()
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md)
-
-
-## Contact
-
-Developed and maintained by the Æ (Architecture Enablement) team
-- [Slack channel](https://mdsol.slack.com/messages/ae)
-- [ae@mdsol.com](mailto:ae@mdsol.com)
-- [JIRA board](https://jira.mdsol.com/secure/RapidBoard.jspa?rapidView=1403)
