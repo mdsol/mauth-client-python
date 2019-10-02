@@ -99,8 +99,8 @@ In this example we use the lambda authenticator to authenticate incoming request
 
 .. code-block:: python
 
-    from mauth_client.mauth_authenticator import MAuthAuthenticator
+    from mauth_client.lambda_authenticator import LambdaAuthenticator
 
-    mauth_authenticator = MAuthAuthenticator(method, url, headers, body)
-    authentic, status_code, message = mauth_authenticator.is_authentic()
-    app_uuid = mauth_authenticator.get_app_uuid()
+    lambda_authenticator = LambdaAuthenticator(method, url, headers, body)
+    authentic, status_code, message = lambda_authenticator.is_authentic()
+    app_uuid = lambda_authenticator.get_app_uuid()

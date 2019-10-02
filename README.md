@@ -36,7 +36,7 @@ This will also install the dependencies.
 To resolve using a requirements file, the index URL can be specified in the first line of the file:
 ```
 --index-url https://<username>:<password>@mdsol.jfrog.io/mdsol/api/pypi/pypi-packages/simple/
-mauth-authenticator==<latest version>
+mauth-client==<latest version>
 ```
 
 ## Usage
@@ -66,6 +66,19 @@ if result.status_code == 200:
 print(result.text)
 ```
 
+The `v2_only_sign_requests` flag can be set as an environment variable to sign outgoing requests with only the V2 protocol:
+
+| Key                     | Value                                                           |
+| ----------------------- | --------------------------------------------------------------- |
+| `V2_ONLY_SIGN_REQUESTS` | **(optional)** Sign requests with only V2. Defaults to `False`. |
+
+This flag can also be passed to the constructor:
+
+```python
+v2_only_sign_requests = True
+mauth = MAuth(APP_UUID, private_key, v2_only_sign_requests)
+```
+
 
 ### Authenticating Incoming Requests in AWS Lambda
 
@@ -78,12 +91,18 @@ The following variables are **required** to be configured in the AWS Lambda envi
 | `MAUTH_URL`    | MAuth service URL (e.g. https://mauth-innovate.imedidata.com) |
 
 ```python
-from mauth_client.mauth_authenticator import MAuthAuthenticator
+from mauth_client.lambda_authenticator import LambdaAuthenticator
 
-mauth_authenticator = MAuthAuthenticator(method, url, headers, body)
-authentic, status_code, message = mauth_authenticator.is_authentic()
-app_uuid = mauth_authenticator.get_app_uuid()
+lambda_authenticator = LambdaAuthenticator(method, url, headers, body)
+authentic, status_code, message = lambda_authenticator.is_authentic()
+app_uuid = lambda_authenticator.get_app_uuid()
 ```
+
+The `v2_only_authenticate` flag can be set as an environment variable to authenticate incoming requests with only the V2 protocol:
+
+| Key                    | Value                                                                   |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `V2_ONLY_AUTHENTICATE` | **(optional)** Authenticate requests with only V2. Defaults to `False`. |
 
 
 ## Contributing
