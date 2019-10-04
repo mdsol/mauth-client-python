@@ -119,7 +119,7 @@ class RequestSignable(Signable):
     SIGNATURE_COMPONENTS_V2 = ["verb", "request_url", "body_digest", "app_uuid", "time", "encoded_query_params"]
 
     def build_attributes(self, **kwargs):
-        body = kwargs.get("body", "")
+        body = kwargs.get("body") or ""
         parsed = urlparse(kwargs.get("url"))
         return {
             "verb": kwargs.get("method"),
