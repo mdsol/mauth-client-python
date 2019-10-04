@@ -36,7 +36,7 @@ MWSV2_HEADERS = { "MCC-Time": EPOCH, "MCC-Authentication": MWSV2_AUTHENTICATION 
 class MockAuthenticator(Authenticator):
     def __init__(self, headers, v2_only_authenticate=False, method="POST"):
         signable = RequestSignable(method=method, url=URL, body=BODY)
-        super().__init__(signable, Signed(headers), v2_only_authenticate)
+        super().__init__(signable, Signed.from_headers(headers), v2_only_authenticate)
 
 
 class TestAuthenticator(unittest.TestCase):

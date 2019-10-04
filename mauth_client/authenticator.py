@@ -46,10 +46,10 @@ class Authenticator(ABC):
         self._signature_valid_v1()
 
     def _time_valid_v1(self):
-        if not self.signed.time:
+        if not self.signed.signature_time:
             raise InauthenticError("Time verification failed. No X-MWS-Time present.")
 
-        if not str(self.signed.time).isdigit():
+        if not str(self.signed.signature_time).isdigit():
             raise InauthenticError("Time verification failed. X-MWS-Time header format incorrect.")
 
         self._time_within_valid_range()
@@ -63,7 +63,9 @@ class Authenticator(ABC):
         if not self.rsa_verifier:
             self.rsa_verifier = RSAVerifier(self.signed.app_uuid)
 
-        expected = self.signable.string_to_sign_v1({ "time": self.signed.time, "app_uuid": self.signed.app_uuid })
+        expected = self.signable.string_to_sign_v1(
+            { "time": self.signed.signature_time, "app_uuid": self.signed.app_uuid }
+        )
         if not self.rsa_verifier.verify_v1(expected, self.signed.signature):
             msg = "Signature verification failed for {}.".format(self.signable.name)
             raise InauthenticError(msg)
@@ -76,10 +78,10 @@ class Authenticator(ABC):
         self._signature_valid_v2()
 
     def _time_valid_v2(self):
-        if not self.signed.time:
+        if not self.signed.signature_time:
             raise InauthenticError("Time verification failed. No MCC-Time present.")
 
-        if not str(self.signed.time).isdigit():
+        if not str(self.signed.signature_time).isdigit():
             raise InauthenticError("Time verification failed. MCC-Time header format incorrect.")
 
         self._time_within_valid_range()
@@ -88,7 +90,9 @@ class Authenticator(ABC):
         if not self.rsa_verifier:
             self.rsa_verifier = RSAVerifier(self.signed.app_uuid)
 
-        expected = self.signable.string_to_sign_v2({ "time": self.signed.time, "app_uuid": self.signed.app_uuid })
+        expected = self.signable.string_to_sign_v2(
+            { "time": self.signed.signature_time, "app_uuid": self.signed.app_uuid }
+        )
         if not self.rsa_verifier.verify_v2(expected, self.signed.signature):
             msg = "Signature verification failed for {}.".format(self.signable.name)
             raise InauthenticError(msg)
@@ -99,7 +103,7 @@ class Authenticator(ABC):
         """
         now = datetime.datetime.now()
         # this needs a float
-        signature_time = datetime.datetime.fromtimestamp(float(self.signed.time))
+        signature_time = datetime.datetime.fromtimestamp(float(self.signed.signature_time))
         if now > signature_time + datetime.timedelta(seconds=self.ALLOWED_DRIFT_SECONDS):
             msg = "Time verification failed. {} not within {}s of {}".format(signature_time,
                                                                              self.ALLOWED_DRIFT_SECONDS,

@@ -10,7 +10,7 @@ class LambdaAuthenticator(Authenticator):
     def __init__(self, method, url, headers, body):
         self.logger = logging.getLogger()
         signable = RequestSignable(method=method, url=url, body=body)
-        super().__init__(signable, Signed(headers), Config.V2_ONLY_AUTHENTICATE)
+        super().__init__(signable, Signed.from_headers(headers), Config.V2_ONLY_AUTHENTICATE)
 
     def get_app_uuid(self):
         return self.signed.app_uuid
