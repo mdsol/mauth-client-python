@@ -102,7 +102,7 @@ class TestAuthenticator(unittest.TestCase):
         with self.assertRaises(InauthenticError) as exc:
             MockAuthenticator(self.v1_headers).authenticate()
         self.assertEqual(str(exc.exception),
-                         "Time verification failed. X-MWS-Time Header format incorrect.")
+                         "Time verification failed. X-MWS-Time header format incorrect.")
 
     @freeze_time(EPOCH_DATETIME)
     def test_token_valid_v1_bad_token(self):
@@ -164,7 +164,7 @@ class TestAuthenticator(unittest.TestCase):
         with self.assertRaises(InauthenticError) as exc:
             MockAuthenticator(self.v2_headers).authenticate()
         self.assertEqual(str(exc.exception),
-                         "Time verification failed. MCC-Time Header format incorrect.")
+                         "Time verification failed. MCC-Time header format incorrect.")
 
     @freeze_time(EPOCH_DATETIME + timedelta(minutes=5, seconds=1))
     def test_time_valid_v2_expired_header(self):

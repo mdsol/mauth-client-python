@@ -50,7 +50,7 @@ class Authenticator(ABC):
             raise InauthenticError("Time verification failed. No X-MWS-Time present.")
 
         if not str(self.signed.time).isdigit():
-            raise InauthenticError("Time verification failed. X-MWS-Time Header format incorrect.")
+            raise InauthenticError("Time verification failed. X-MWS-Time header format incorrect.")
 
         self._time_within_valid_range()
 
@@ -80,7 +80,7 @@ class Authenticator(ABC):
             raise InauthenticError("Time verification failed. No MCC-Time present.")
 
         if not str(self.signed.time).isdigit():
-            raise InauthenticError("Time verification failed. MCC-Time Header format incorrect.")
+            raise InauthenticError("Time verification failed. MCC-Time header format incorrect.")
 
         self._time_within_valid_range()
 
