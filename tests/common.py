@@ -11,6 +11,6 @@ def load_key(keytype="pub"):
     content = ""
     with open(os.path.join(os.path.dirname(__file__),
                            "keys",
-                           "fake_mauth_authenticator.%s.key" % keytype), "r") as key:
+                           "fake_mauth_authenticator.{}.key".format(keytype)), "r") as key:
         content = key.read()
     return content

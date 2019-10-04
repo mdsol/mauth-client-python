@@ -35,7 +35,7 @@ class Signer:
         signature = self.signature_v1(signable.string_to_sign_v1(override_attributes))
 
         return {
-            X_MWS_AUTH: "%s %s:%s" % (MWS_TOKEN, self.app_uuid, signature),
+            X_MWS_AUTH: "{} {}:{}".format(MWS_TOKEN, self.app_uuid, signature),
             X_MWS_TIME: override_attributes.get("time")
         }
 
@@ -44,7 +44,7 @@ class Signer:
         signature = self.signature_v2(signable.string_to_sign_v2(override_attributes))
 
         return {
-            MCC_AUTH: "%s %s:%s%s" % (MWSV2_TOKEN, self.app_uuid, signature, AUTH_HEADER_DELIMITER),
+            MCC_AUTH: "{} {}:{}{}".format(MWSV2_TOKEN, self.app_uuid, signature, AUTH_HEADER_DELIMITER),
             MCC_TIME: override_attributes.get("time")
         }
 

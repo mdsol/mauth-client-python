@@ -117,10 +117,10 @@ class TestAuthenticator(unittest.TestCase):
         with self.assertRaises(InauthenticError) as exc:
             MockAuthenticator(self.v1_headers).authenticate()
         self.assertEqual(str(exc.exception),
-                         "Time verification failed. %s "
-                         "not within %ss of %s" % (datetime.fromtimestamp(int(EPOCH)),
-                                                   MockAuthenticator.ALLOWED_DRIFT_SECONDS,
-                                                   datetime.now()))
+                         "Time verification failed. {} "
+                         "not within {}s of {}".format(datetime.fromtimestamp(int(EPOCH)),
+                                                        MockAuthenticator.ALLOWED_DRIFT_SECONDS,
+                                                        datetime.now()))
 
     @freeze_time(EPOCH_DATETIME)
     def test_authentication_v1_does_not_authenticate_a_false_message(self):
@@ -171,10 +171,10 @@ class TestAuthenticator(unittest.TestCase):
         with self.assertRaises(InauthenticError) as exc:
             MockAuthenticator(self.v2_headers).authenticate()
         self.assertEqual(str(exc.exception),
-                         "Time verification failed. %s "
-                         "not within %ss of %s" % (datetime.fromtimestamp(int(EPOCH)),
-                                                   MockAuthenticator.ALLOWED_DRIFT_SECONDS,
-                                                   datetime.now()))
+                         "Time verification failed. {} "
+                         "not within {}s of {}".format(datetime.fromtimestamp(int(EPOCH)),
+                                                        MockAuthenticator.ALLOWED_DRIFT_SECONDS,
+                                                        datetime.now()))
 
     @freeze_time(EPOCH_DATETIME)
     def test_authentication_v2_does_not_authenticate_a_false_message(self):
