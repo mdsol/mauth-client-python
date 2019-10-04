@@ -62,8 +62,10 @@ class TestLambdaAuthenticator(unittest.TestCase):
 
         self.assertFalse(authentic)
         self.assertEqual(status, 401)
-        self.assertEqual(message,
-            "This service requires mAuth v2 mcc-authentication header but only v1 x-mws-authentication is present")
+        self.assertEqual(
+            message,
+            "This service requires mAuth v2 mcc-authentication header but only v1 x-mws-authentication is present"
+        )
 
     def test_is_authentic_mauth_not_present(self):
         self.logger.setLevel(logging.ERROR)
