@@ -8,7 +8,7 @@ class MAuth(requests.auth.AuthBase):
     """
     Custom requests authorizer for MAuth
     """
-    def __init__(self, app_uuid, private_key_data, v2_only_sign_requests=None):
+    def __init__(self, app_uuid, private_key_data, v2_only_sign_requests=Config.V2_ONLY_SIGN_REQUESTS):
         """
         Create a new MAuth Instance
 
@@ -16,9 +16,6 @@ class MAuth(requests.auth.AuthBase):
         :param str private_key_data: Content of the Private Key File
         :param bool v2_only_sign_requests: Flag to sign requests with only V2
         """
-        if v2_only_sign_requests is None:
-            v2_only_sign_requests = Config.V2_ONLY_SIGN_REQUESTS
-
         self.signer = Signer(app_uuid, private_key_data, v2_only_sign_requests)
 
     def __call__(self, request):

@@ -35,12 +35,3 @@ class MAuthBaseTest(unittest.TestCase):
             sorted(list(request.headers.keys())),
             ["Content-Type", "MCC-Authentication", "MCC-Time"]
         )
-
-    def test_call_v2_only_from_config(self):
-        Config.V2_ONLY_SIGN_REQUESTS = True
-        auth = MAuth(APP_UUID, self.example_private_key)
-        request = Request("GET", URL, auth=auth).prepare()
-        self.assertEqual(
-            sorted(list(request.headers.keys())),
-            ["Content-Type", "MCC-Authentication", "MCC-Time"]
-        )
