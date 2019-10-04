@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import base64
 import datetime
 from .consts import MWS_TOKEN
 from .exceptions import InauthenticError, MAuthNotPresent, MissingV2Error
