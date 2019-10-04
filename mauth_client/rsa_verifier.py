@@ -59,11 +59,8 @@ class RSAVerifier:
         decoded = base64.b64decode(make_bytes(signature))
         # transform the decoded signature to int
         encrypted = rsa.transform.bytes2int(decoded)
-        """:type : int"""
         payload = rsa.core.decrypt_int(encrypted, self.public_key.e, self.public_key.n)
-        """:type : int"""
         padded = rsa.transform.int2bytes(payload, rsa.common.byte_size(self.public_key.n))
-        """:type : str"""
         return padded
 
     @staticmethod
