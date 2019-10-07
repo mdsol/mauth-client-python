@@ -62,12 +62,12 @@ PRIVATE_KEY     Encrypted private key for the APP_UUID
 MAUTH_URL       MAuth service URL (e.g. https://mauth-sandbox.imedidata.net)
 ==============  ===============================================================
 
-2. Create a `MAuthAuthenticator` instance using the `mauth_client.mauth_authenticator.MAuthAuthenticator` class::
+2. Create a `LambdaAuthenticator` instance using the `mauth_client.lambda_authenticator.LambdaAuthenticator` class::
 
-    from mauth_client.mauth_authenticator import MAuthAuthenticator
+    from mauth_client.lambda_authenticator import LambdaAuthenticator
 
-    mauth_authenticator = MAuthAuthenticator(method, url, headers, body)
+    lambda_authenticator = LambdaAuthenticator(method, url, headers, body)
 
 3. Authenticate incoming request by calling the `is_authentic` method::
 
-    authentic, status_code, message = mauth_authenticator.is_authentic()
+    authentic, status_code, message = lambda_authenticator.is_authentic()

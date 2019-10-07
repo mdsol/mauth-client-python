@@ -36,7 +36,7 @@ This will also install the dependencies.
 To resolve using a requirements file, the index URL can be specified in the first line of the file:
 ```
 --index-url https://<username>:<password>@mdsol.jfrog.io/mdsol/api/pypi/pypi-packages/simple/
-mauth-authenticator==<latest version>
+mauth-client==<latest version>
 ```
 
 ## Usage
@@ -55,7 +55,7 @@ mauth = MAuth(APP_UUID, private_key)
 # Call an MAuth protected resource, in this case an iMedidata API
 # listing the studies for a particular user
 user_uuid = "10ac3b0e-9fe2-11df-a531-12313900d531"
-url = "https://innovate.imedidata.com/api/v2/users/%s/studies.json" % user_uuid
+url = "https://innovate.imedidata.com/api/v2/users/{}/studies.json".format(user_uuid)
 
 # Make the requests call, passing the auth client
 result = requests.get(url, auth=mauth)
@@ -64,6 +64,19 @@ result = requests.get(url, auth=mauth)
 if result.status_code == 200:
     print([r["uuid"] for r in result.json()["studies"]])
 print(result.text)
+```
+
+The `v2_only_sign_requests` flag can be set as an environment variable to sign outgoing requests with only the V2 protocol:
+
+| Key                     | Value                                                           |
+| ----------------------- | --------------------------------------------------------------- |
+| `V2_ONLY_SIGN_REQUESTS` | **(optional)** Sign requests with only V2. Defaults to `False`. |
+
+This flag can also be passed to the constructor:
+
+```python
+v2_only_sign_requests = True
+mauth = MAuth(APP_UUID, private_key, v2_only_sign_requests)
 ```
 
 
@@ -78,12 +91,18 @@ The following variables are **required** to be configured in the AWS Lambda envi
 | `MAUTH_URL`    | MAuth service URL (e.g. https://mauth-innovate.imedidata.com) |
 
 ```python
-from mauth_client.mauth_authenticator import MAuthAuthenticator
+from mauth_client.lambda_authenticator import LambdaAuthenticator
 
-mauth_authenticator = MAuthAuthenticator(method, url, headers, body)
-authentic, status_code, message = mauth_authenticator.is_authentic()
-app_uuid = mauth_authenticator.get_app_uuid()
+lambda_authenticator = LambdaAuthenticator(method, url, headers, body)
+authentic, status_code, message = lambda_authenticator.is_authentic()
+app_uuid = lambda_authenticator.get_app_uuid()
 ```
+
+The `v2_only_authenticate` flag can be set as an environment variable to authenticate incoming requests with only the V2 protocol:
+
+| Key                    | Value                                                                   |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `V2_ONLY_AUTHENTICATE` | **(optional)** Authenticate requests with only V2. Defaults to `False`. |
 
 
 ## Contributing
