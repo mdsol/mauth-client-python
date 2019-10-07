@@ -6,9 +6,9 @@ import unittest
 from unittest.mock import MagicMock
 
 import requests_mock
-from mauth_client.mauth_authenticator.key_holder import KeyHolder
-from mauth_client.mauth_authenticator.exceptions import InauthenticError
-from tests.mauth_authenticator.common import load_key
+from mauth_client.key_holder import KeyHolder
+from mauth_client.exceptions import InauthenticError
+from .common import load_key
 
 APP_UUID = 'f5af50b2-bf7d-4c29-81db-76d086d4808a'
 MAUTH_URL = 'https://mauth.com'

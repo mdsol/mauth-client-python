@@ -1,16 +1,16 @@
 import cachetools
-import os
 import re
 import requests
 from requests.adapters import HTTPAdapter
-from .lambda_helper import generate_mauth
-from .exceptions import InauthenticError
+from mauth_client.config import Config
+from mauth_client.lambda_helper import generate_mauth
+from mauth_client.exceptions import InauthenticError
 
 CACHE_MAXSIZE = 128
 CACHE_TTL = 60
-MAX_AGE_REGEX = re.compile('max-age=(\d+)')
+MAX_AGE_REGEX = re.compile(r"max-age=(\d+)")
 
-class KeyHolder(object):
+class KeyHolder:
     _CACHE = None
     _MAUTH = None
     _MAUTH_URL = None
@@ -33,7 +33,7 @@ class KeyHolder(object):
 
     @classmethod
     def _create_cache(cls, cache_control):
-        max_age_match = MAX_AGE_REGEX.match(cache_control or '')
+        max_age_match = MAX_AGE_REGEX.match(cache_control or "")
         ttl = int(max_age_match.group(1)) if max_age_match else CACHE_TTL
         return cachetools.TTLCache(maxsize=CACHE_MAXSIZE, ttl=ttl)
 
@@ -42,18 +42,18 @@ class KeyHolder(object):
         if not cls._MAUTH:
             cls._MAUTH = generate_mauth()
         if not cls._MAUTH_URL:
-            cls._MAUTH_URL = os.environ['MAUTH_URL']
+            cls._MAUTH_URL = Config.MAUTH_URL
 
-        url = '{}/mauth/v1/security_tokens/{}.json'.format(cls._MAUTH_URL, app_uuid)
+        url = "{}/mauth/v1/security_tokens/{}.json".format(cls._MAUTH_URL, app_uuid)
         response = cls._request_session().get(url, auth=cls._MAUTH)
         if response.status_code == 200:
-            return response.json().get('security_token').get('public_key_str'), response.headers.get('Cache-Control')
-        else:
-            raise InauthenticError('Failed to fetch the public key for {} from {}'.format(app_uuid, cls._MAUTH_URL))
+            return response.json().get("security_token").get("public_key_str"), response.headers.get("Cache-Control")
+
+        raise InauthenticError("Failed to fetch the public key for {} from {}".format(app_uuid, cls._MAUTH_URL))
 
     @classmethod
     def _request_session(cls):
         session = requests.Session()
         adapter = HTTPAdapter(max_retries=cls._MAX_RETRIES)
-        session.mount('https://', adapter)
+        session.mount("https://", adapter)
         return session
