@@ -29,7 +29,7 @@ class LambdaAuthenticator(Authenticator):
         except UnableToAuthenticateError as exc:
             self.logger.error(str(exc))
             return False, 500, str(exc)
-        return True, 200
+        return True, 200, ""
 
     def _log_authentication_request(self):
         signed_app_uuid = self.signed.app_uuid if self.signed.app_uuid else "[none provided]"

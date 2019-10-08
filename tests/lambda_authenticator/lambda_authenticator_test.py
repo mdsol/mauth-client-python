@@ -45,10 +45,11 @@ class TestLambdaAuthenticator(unittest.TestCase):
     def test_is_authentic(self):
         self.logger.setLevel(logging.INFO)
         self.lambda_authenticator.authenticate = MagicMock(return_value=True)
-        authentic, status = self.lambda_authenticator.is_authentic()
+        authentic, status, message = self.lambda_authenticator.is_authentic()
 
         self.assertTrue(authentic)
         self.assertEqual(status, 200)
+        self.assertEqual(message, "")
 
         self.assertEqual(self.captor.getvalue(),
                          "Mauth-client attempting to authenticate request from app with mauth" \
