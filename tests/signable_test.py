@@ -23,7 +23,7 @@ class RequestSignableTest(unittest.TestCase):
             "1309891855"
 
         epoch = 1309891855
-        tested = self.request_signable.string_to_sign_v1({ "app_uuid": APP_UUID, "time": epoch })
+        tested = self.request_signable.string_to_sign_v1({ "app_uuid": APP_UUID, "time": epoch }).decode("utf-8")
         self.assertEqual(tested, expected)
 
     def test_string_to_sign_v1_missing_attributes(self):
@@ -41,7 +41,7 @@ class RequestSignableTest(unittest.TestCase):
             "k=v"
 
         epoch = 1309891855
-        tested = self.request_signable.string_to_sign_v2({ "app_uuid": APP_UUID, "time": epoch })
+        tested = self.request_signable.string_to_sign_v2({ "app_uuid": APP_UUID, "time": epoch }).decode("utf-8")
         self.assertEqual(tested, expected)
 
     def test_string_to_sign_v2_missing_attributes(self):
@@ -77,7 +77,7 @@ class RequestSignableTest(unittest.TestCase):
             "verb": "GET",
             "request_url": "/studies/123/users",
             "query_string": "",
-            "body": '{"key": "data"}'
+            "body": b'{"key": "data"}'
         }
         url = "https://innovate.imedidata.com/studies/123/users"
         binary_body = json.dumps( { "key": "data" } ).encode("utf8")
