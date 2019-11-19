@@ -7,6 +7,8 @@ def make_bytes(val):
     """
     if isinstance(val, str):
         return val.encode("utf-8")
+    if isinstance(val, int):
+        return str(val).encode("utf-8")
 
     return val
 
