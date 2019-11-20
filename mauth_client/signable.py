@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from urllib.parse import quote, urlparse
-from .utils import hexdigest
+from .utils import hexdigest, make_bytes
 from .exceptions import UnableToSignError
 
 
@@ -42,7 +42,7 @@ class Signable(ABC):
         if missing_attributes:
             raise UnableToSignError("Missing required attributes to sign: {}".format(missing_attributes))
 
-        return "\n".join([str(attributes_for_signing.get(k, "")) for k in self.SIGNATURE_COMPONENTS])
+        return b"\n".join([make_bytes(attributes_for_signing.get(k, "")) for k in self.SIGNATURE_COMPONENTS])
 
     def string_to_sign_v2(self, override_attributes):
         """
@@ -66,7 +66,7 @@ class Signable(ABC):
         # memoization of body_digest
         # note that if :body is None we hash an empty string ("")
         if "body_digest" not in self.attributes_for_signing:
-            body_digest = hexdigest(str(self.attributes_for_signing.get("body", "")))
+            body_digest = hexdigest(self.attributes_for_signing.get("body", ""))
             self.attributes_for_signing["body_digest"] = body_digest
 
         attrs_with_overrides = { **self.attributes_for_signing, **override_attributes }
@@ -80,7 +80,7 @@ class Signable(ABC):
         if missing_attributes:
             raise UnableToSignError("Missing required attributes to sign: {}".format(missing_attributes))
 
-        return "\n".join([str(attrs_with_overrides.get(k, "")) for k in self.SIGNATURE_COMPONENTS_V2])
+        return b"\n".join([make_bytes(attrs_with_overrides.get(k, "")) for k in self.SIGNATURE_COMPONENTS_V2])
 
     def encode_query_string(self, query_string):
         """
@@ -120,10 +120,10 @@ class RequestSignable(Signable):
 
     def build_attributes(self, **kwargs):
         body = kwargs.get("body") or ""
-        parsed = urlparse(kwargs.get("url"))
+        parsed = urlparse(kwargs.get("url"), allow_fragments=False)
         return {
             "verb": kwargs.get("method"),
             "request_url": parsed.path,
             "query_string": parsed.query,
-            "body": body.decode("utf-8") if isinstance(body, bytes) else body
+            "body": body
         }

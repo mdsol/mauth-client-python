@@ -25,7 +25,7 @@ class MAuthBaseTest(unittest.TestCase):
         request = Request("GET", URL, auth=auth).prepare()
         self.assertEqual(
             sorted(list(request.headers.keys())),
-            ["Content-Type", "MCC-Authentication", "MCC-Time", "X-MWS-Authentication", "X-MWS-Time"]
+            ["MCC-Authentication", "MCC-Time", "X-MWS-Authentication", "X-MWS-Time"]
         )
 
     def test_call_v2_only(self):
@@ -33,5 +33,5 @@ class MAuthBaseTest(unittest.TestCase):
         request = Request("GET", URL, auth=auth).prepare()
         self.assertEqual(
             sorted(list(request.headers.keys())),
-            ["Content-Type", "MCC-Authentication", "MCC-Time"]
+            ["MCC-Authentication", "MCC-Time"]
         )

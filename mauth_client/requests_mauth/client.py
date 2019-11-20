@@ -32,4 +32,4 @@ class MAuth(requests.auth.AuthBase):
         :param requests.models.PreparedRequest request: the Request object
         """
         request_signable = RequestSignable(method=request.method, url=request.url, body=request.body)
-        return { **self.signer.signed_headers(request_signable), "Content-Type": "application/json;charset=utf-8" }
+        return { **self.signer.signed_headers(request_signable) }

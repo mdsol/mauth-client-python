@@ -14,6 +14,14 @@ REQUEST_ATTRIBUTES = {
 }
 ADDITIONAL_ATTRIBUTES = { "app_uuid": APP_UUID, "time": EPOCH }
 
+with open(os.path.join(os.path.dirname(__file__), "blank.jpeg"), "rb") as binary_file:
+    BINARY_FILE_BODY = binary_file.read()
+
+REQUEST_ATTRIBUTES_WITH_BINARY_BODY = {
+    "method": "PUT",
+    "url": 'https://example.org/v1/pictures?key=-_.~!@#$%^*()+{}|:"\'`<>?&∞=v&キ=v&0=v&a=v&a=b&a=c&a=a&k=&k=v',
+    "body": BINARY_FILE_BODY
+}
 
 class SignerTest(unittest.TestCase):
     def setUp(self):
@@ -22,6 +30,7 @@ class SignerTest(unittest.TestCase):
         self.signer = Signer(APP_UUID, private_key)
         self.signer_v2_only = Signer(APP_UUID, private_key, True)
         self.signable = RequestSignable(**REQUEST_ATTRIBUTES)
+        self.signable_with_binary_body = RequestSignable(**REQUEST_ATTRIBUTES_WITH_BINARY_BODY)
 
     @freeze_time(EPOCH_DATETIME)
     def test_signed_headers(self):
@@ -66,3 +75,13 @@ class SignerTest(unittest.TestCase):
     def test_signature_v2_unicode(self):
         tested = self.signer.signature_v2("こんにちはÆ")
         self.assertEqual(tested, "F9OqgCXr6vKAVBoU8Iogg09HhMZ+FpcJ8Q8DJ/M82vCDjVdxYQ1BYpuyXWN2jIH5CWKnYvXxF49aKwiXuo7bgUArNZZJuwRzI5hSEwsY6weVzlsO8DmdDR62MKozK9NBEr7nnVka8NFEWrprWNPrgvy//YK5NAPSt+tLq/7qk5+qJZRjAjAhl09FD2pzYNGZkLx24UuPPfPSkvQKcybcAgY5y17FNkQTYYudjBy2hG6Df+Op77VjKx5yaLHZfoKcOmxc6UdE09kkoS5rsW2Y65kLi4xWbLK3i+VUC+WCqL8Vt7McJFMAwOyACDJPr4Z3VtHUZgnT9b5n7c7U/CItRg==")
+
+    def test_signature_v1_binary_body(self):
+        string_to_sign_v1 = self.signable_with_binary_body.string_to_sign_v1(ADDITIONAL_ATTRIBUTES)
+        tested = self.signer.signature_v1(string_to_sign_v1)
+        self.assertEqual(tested, "hDKYDRnzPFL2gzsru4zn7c7E7KpEvexeF4F5IR+puDxYXrMmuT2/fETZty5NkGGTZQ1nI6BTYGQGsU/73TkEAm7SvbJZcB2duLSCn8H5D0S1cafory1gnL1TpMPBlY8J/lq/Mht2E17eYw+P87FcpvDShINzy8GxWHqfquBqO8ml4XtirVEtAlI0xlkAsKkVq4nj7rKZUMS85mzogjUAJn3WgpGCNXVU+EK+qElW5QXk3I9uozByZhwBcYt5Cnlg15o99+53wKzMMmdvFmVjA1DeUaSO7LMIuw4ZNLVdDcHJx7ZSpAKZ/EA34u1fYNECFcw5CSKOjdlU7JFr4o8Phw==")
+
+    def test_signature_v2_binary_body(self):
+        string_to_sign_v2 = self.signable_with_binary_body.string_to_sign_v2(ADDITIONAL_ATTRIBUTES)
+        tested = self.signer.signature_v2(string_to_sign_v2)
+        self.assertEqual(tested, "kXMtivUVa2aciWcHpxWNFtIAKGHkbC2LjvQCYx5llhhiZOfFQOWNyEcy3qdHj03g27FhefGeMNke/4PThXVRD0fg06Kn+wSCZp+ZHTxUp9m1ZDjlAaNGYjS+LMkQs2oxwg/iJFFAAzvjxzZ9jIhinWM6+PXok5NfU2rvbjjaI5WfRZa8wNl0NeOYlBZPICTcARbT1G6Kr3bjkgBTixNY2dSR1s7MmvpPHzfWSAyaYFppWnJwstRAU/JsR/JzcATZNx/CIk8N+46aWN1Na5avQgLFoNJn6eenXW3W51cENQyhtw7jatvrIKnVckAMoOkygfkbHdCixNfV5G0u1LHU3w==")
