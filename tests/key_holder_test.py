@@ -12,6 +12,7 @@ from .common import load_key
 
 APP_UUID = 'f5af50b2-bf7d-4c29-81db-76d086d4808a'
 MAUTH_URL = 'https://mauth.com'
+MAUTH_API_VERSION = "v1"
 MAUTH_PATH = '{}/mauth/v1/security_tokens/{}.json'.format(MAUTH_URL, APP_UUID)
 PUBLIC_KEY = load_key('rsapub')
 
@@ -28,8 +29,11 @@ CACHE_CONTROL = 'max-age=60, private'
 
 class TestKeyHolder(unittest.TestCase):
     def setUp(self):
-        KeyHolder._MAUTH = MagicMock()
-        KeyHolder._MAUTH_URL = MAUTH_URL
+        KeyHolder._MAUTH = {
+            "auth": MagicMock(),
+            "url": MAUTH_URL,
+            "api_version": MAUTH_API_VERSION
+        }
 
         # redirect the output of stdout to self.captor
         self.captor = StringIO()

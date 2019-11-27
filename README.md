@@ -80,9 +80,11 @@ mauth = MAuth(APP_UUID, private_key, v2_only_sign_requests)
 ```
 
 
-### Authenticating Incoming Requests in AWS Lambda
+### Authenticating Incoming Requests
 
-The following variables are **required** to be configured in the AWS Lambda environment variables setting:
+MAuth Client Python supports AWS Lambda functions and Flask applications to authenticate MAuth signed requests.
+
+The following variables are **required** to be configured in the environment variables:
 
 | Key            | Value                                                         |
 | -------------- | ------------------------------------------------------------- |
@@ -90,19 +92,54 @@ The following variables are **required** to be configured in the AWS Lambda envi
 | `PRIVATE_KEY`  | Encrypted private key for the APP_UUID                        |
 | `MAUTH_URL`    | MAuth service URL (e.g. https://mauth-innovate.imedidata.com) |
 
+
+The following variables can optionally be set in the environment variables:
+
+| Key                    | Value                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------- |
+| `MAUTH_API_VERSION`    | **(optional)** MAuth API version. Only `v1` exists as of this writing. Defaults to `v1`.  |
+| `MAUTH_MODE`           | **(optional)** Method to authenticate requests. `local` or `remote`. Defaults to `local`. |
+| `V2_ONLY_AUTHENTICATE` | **(optional)** Authenticate requests with only V2. Defaults to `False`.                   |
+
+
+#### AWS Lambda functions
+
 ```python
 from mauth_client.lambda_authenticator import LambdaAuthenticator
 
-lambda_authenticator = LambdaAuthenticator(method, url, headers, body)
-authentic, status_code, message = lambda_authenticator.is_authentic()
-app_uuid = lambda_authenticator.get_app_uuid()
+authenticator = LambdaAuthenticator(method, url, headers, body)
+authentic, status_code, message = authenticator.is_authentic()
+app_uuid = authenticator.get_app_uuid()
 ```
 
-The `v2_only_authenticate` flag can be set as an environment variable to authenticate incoming requests with only the V2 protocol:
+#### Flask applications
 
-| Key                    | Value                                                                   |
-| ---------------------- | ----------------------------------------------------------------------- |
-| `V2_ONLY_AUTHENTICATE` | **(optional)** Authenticate requests with only V2. Defaults to `False`. |
+You will need to create an application instance and initialize it with FlaskAuthenticator:
+
+```python
+from flask import Flask
+from mauth_client.flask_authenticator import FlaskAuthenticator
+
+app = Flask("Some Sample App")
+authenticator = FlaskAuthenticator()
+authenticator.init_app(app)
+```
+
+To specify routes that need to be authenticated use the `requires_authentication` decorator:
+
+```python
+from flask import Flask
+from mauth_client.flask_authenticator import requires_authentication
+
+@app.route("/some/private/route", methods=["GET"])
+@requires_authentication
+def private_route():
+    return "Wibble"
+
+@app.route("/app_status", methods=["GET"])
+def app_status():
+    return "OK"
+```
 
 
 ## Contributing
