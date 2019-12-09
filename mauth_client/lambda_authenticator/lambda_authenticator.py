@@ -5,7 +5,7 @@ from mauth_client.signable import RequestSignable
 from mauth_client.signed import Signed
 
 
-class LambdaAuthenticator():
+class LambdaAuthenticator:
     def __init__(self, method, url, headers, body):
         logger = logging.getLogger()
         signable = RequestSignable(method=method, url=url, body=body)

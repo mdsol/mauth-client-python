@@ -11,7 +11,7 @@ from mauth_client.signed import Signed
 logger = logging.getLogger("flask_mauth")
 
 
-class FlaskAuthenticator():
+class FlaskAuthenticator:
     """
     The MAuth Authenticator instance
     """
@@ -72,7 +72,6 @@ def requires_authentication(func):
         authenticator = current_app.authenticator
         authentic, status, message = authenticator.authenticate(request)
         if not authentic:
-            # TODO: do we return the underlying error?  Currently going into the log
             _message = json.dumps(dict(errors=dict(mauth=[message])))
             return Response(response=_message,
                             status=status,
