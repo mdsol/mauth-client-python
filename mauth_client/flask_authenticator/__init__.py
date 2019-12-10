@@ -1,0 +1,1 @@
+from .flask_authenticator import FlaskAuthenticator, requires_authentication

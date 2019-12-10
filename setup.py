@@ -37,6 +37,7 @@ setup(
     platforms='any',
     install_requires=INSTALL_REQUIRES,
     tests_require=['boto3',
+                   'flask',
                    'freezegun',
                    'python-dateutil<2.7.0,>=2.1', # botocore requires python-dateutil < 2.7.0
                    'requests-mock'],

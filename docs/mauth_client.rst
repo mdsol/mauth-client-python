@@ -8,6 +8,7 @@ Subpackages
 
     mauth_client.requests_mauth
     mauth_client.lambda_authenticator
+    mauth_client.flask_authenticator
 
 
 mauth\_client.authenticator module

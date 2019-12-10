@@ -13,7 +13,6 @@ MAX_AGE_REGEX = re.compile(r"max-age=(\d+)")
 class KeyHolder:
     _CACHE = None
     _MAUTH = None
-    _MAUTH_URL = None
     _MAX_RETRIES = 3
 
     @classmethod
@@ -40,16 +39,18 @@ class KeyHolder:
     @classmethod
     def _get_public_key_and_cache_control_from_mauth(cls, app_uuid):
         if not cls._MAUTH:
-            cls._MAUTH = generate_mauth()
-        if not cls._MAUTH_URL:
-            cls._MAUTH_URL = Config.MAUTH_URL
+            cls._MAUTH = {
+                "auth": generate_mauth(),
+                "url": Config.MAUTH_URL,
+                "api_version": Config.MAUTH_API_VERSION
+            }
 
-        url = "{}/mauth/v1/security_tokens/{}.json".format(cls._MAUTH_URL, app_uuid)
-        response = cls._request_session().get(url, auth=cls._MAUTH)
+        url = "{}/mauth/{}/security_tokens/{}.json".format(cls._MAUTH["url"], cls._MAUTH["api_version"], app_uuid)
+        response = cls._request_session().get(url, auth=cls._MAUTH["auth"])
         if response.status_code == 200:
             return response.json().get("security_token").get("public_key_str"), response.headers.get("Cache-Control")
 
-        raise InauthenticError("Failed to fetch the public key for {} from {}".format(app_uuid, cls._MAUTH_URL))
+        raise InauthenticError("Failed to fetch the public key for {} from {}".format(app_uuid, cls._MAUTH["url"]))
 
     @classmethod
     def _request_session(cls):
