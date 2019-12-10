@@ -1,3 +1,6 @@
+# 0.4.0
+- Add `FlaskAuthenticator` to authenticate requests in Flask applications.
+
 # 0.3.0
 - Support binary request bodies.
 

@@ -19,7 +19,7 @@ Or directly from github with::
 Simple signing of Requests
 --------------------------
 
-In order to be able to utilise this you will need to have setup your MAuth Credentials.  To do so:
+In order to be able to utilise this you will need to have setup your MAuth Credentials. To do so:
 
 1. Generate and register an Application (see :doc:`mauth_setup` for instructions)
 
@@ -71,3 +71,40 @@ MAUTH_URL       MAuth service URL (e.g. https://mauth-sandbox.imedidata.net)
 3. Authenticate incoming request by calling the `is_authentic` method::
 
     authentic, status_code, message = lambda_authenticator.is_authentic()
+
+
+Authenticating Incoming Requests in Flask applications
+------------------------------------------------------
+
+1. Configure the following environment variables:
+
+==============  ===============================================================
+Key             Value
+==============  ===============================================================
+APP_UUID        APP_UUID for the Flask application
+PRIVATE_KEY     Encrypted private key for the APP_UUID
+MAUTH_URL       MAuth service URL (e.g. https://mauth-sandbox.imedidata.net)
+==============  ===============================================================
+
+2. Create an application instance and initialize it with the flask authenticator::
+
+    from flask import Flask
+    from mauth_client.flask_authenticator import FlaskAuthenticator
+
+    app = Flask("Some Sample App")
+    authenticator = MAuthAuthenticator()
+    authenticator.init_app(app)
+
+3. Specify routes that need to be authenticated using the `requires_authentication` decorator::
+
+    from flask import Flask
+    from mauth_client.flask_authenticator import requires_authentication
+
+    @app.route("/some/private/route", methods=["GET"])
+    @requires_authentication
+    def private_route():
+        return 'Wibble'
+
+    @app.route("/app_status", methods=["GET"])
+    def app_status():
+        return 'OK'

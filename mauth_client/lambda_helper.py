@@ -1,16 +1,17 @@
 from base64 import b64decode
-import boto3
 from mauth_client.config import Config
 from mauth_client.requests_mauth import MAuth
 
+RSA_PRIVATE_KEY = "RSA PRIVATE KEY"
 
 def generate_mauth():
-    kms_client = boto3.client("kms")
-    app_uuid = Config.APP_UUID
-    encrypted = Config.PRIVATE_KEY
-    private_key = kms_client.decrypt(CiphertextBlob=b64decode(encrypted))["Plaintext"] \
-                            .decode("ascii") \
-                            .replace(" ", "\n").replace("\nRSA\nPRIVATE\nKEY", " RSA PRIVATE KEY") \
-                            .encode("ascii")
+    return MAuth(Config.APP_UUID, _get_private_key())
 
-    return MAuth(app_uuid, private_key)
+def _get_private_key():
+    private_key = Config.PRIVATE_KEY
+    if not RSA_PRIVATE_KEY in private_key:
+        import boto3
+        kms_client = boto3.client("kms")
+        private_key = kms_client.decrypt(CiphertextBlob=b64decode(private_key))["Plaintext"].decode("ascii")
+
+    return private_key.replace(" ", "\n").replace("\nRSA\nPRIVATE\nKEY", " RSA PRIVATE KEY")
