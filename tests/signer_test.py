@@ -9,8 +9,8 @@ APP_UUID = '5ff4257e-9c16-11e0-b048-0026bbfffe5e'
 EPOCH = '1309891855'  # 2011-07-05 18:50:00 UTC
 EPOCH_DATETIME = datetime.fromtimestamp(float(EPOCH))
 REQUEST_ATTRIBUTES = {
-    "method": "GET",
-    "url": "https://example.org/studies/123/users?k=v"
+    "method": "PUT",
+    "url": 'https://example.org/v1/pictures?key=-_.~ !@#$%^*()+{}|:"\'`<>?&∞=v&キ=v&0=v&a=v&a=b&a=c&a=a&k=&k=v'
 }
 ADDITIONAL_ATTRIBUTES = { "app_uuid": APP_UUID, "time": EPOCH }
 
@@ -18,8 +18,7 @@ with open(os.path.join(os.path.dirname(__file__), "blank.jpeg"), "rb") as binary
     BINARY_FILE_BODY = binary_file.read()
 
 REQUEST_ATTRIBUTES_WITH_BINARY_BODY = {
-    "method": "PUT",
-    "url": 'https://example.org/v1/pictures?key=-_.~!@#$%^*()+{}|:"\'`<>?&∞=v&キ=v&0=v&a=v&a=b&a=c&a=a&k=&k=v',
+    **REQUEST_ATTRIBUTES,
     "body": BINARY_FILE_BODY
 }
 
@@ -84,4 +83,14 @@ class SignerTest(unittest.TestCase):
     def test_signature_v2_binary_body(self):
         string_to_sign_v2 = self.signable_with_binary_body.string_to_sign_v2(ADDITIONAL_ATTRIBUTES)
         tested = self.signer.signature_v2(string_to_sign_v2)
-        self.assertEqual(tested, "kXMtivUVa2aciWcHpxWNFtIAKGHkbC2LjvQCYx5llhhiZOfFQOWNyEcy3qdHj03g27FhefGeMNke/4PThXVRD0fg06Kn+wSCZp+ZHTxUp9m1ZDjlAaNGYjS+LMkQs2oxwg/iJFFAAzvjxzZ9jIhinWM6+PXok5NfU2rvbjjaI5WfRZa8wNl0NeOYlBZPICTcARbT1G6Kr3bjkgBTixNY2dSR1s7MmvpPHzfWSAyaYFppWnJwstRAU/JsR/JzcATZNx/CIk8N+46aWN1Na5avQgLFoNJn6eenXW3W51cENQyhtw7jatvrIKnVckAMoOkygfkbHdCixNfV5G0u1LHU3w==")
+        self.assertEqual(tested, "GpZIRB8RIxlfsjcROBElMEwa0r7jr632GkBe+R8lOv72vVV7bFMbJwQUHYm6vL/NKC7g4lJwvWcF60lllIUGwv/KWUOQwerqo5yCNoNumxjgDKjq7ILl8iFxsrV9LdvxwGyEBEwAPKzoTmW9xradxmjn4ZZVMnQKEMns6iViBkwaAW2alp4ZtVfJIZHRRyiuFnITWH1PniyG0kI4Li16kY25VfmzfNkdAi0Cnl27Cy1+DtAl1zVnz6ObMAdtmsEtplvlqsRCRsdd37VfuUxUlolNpr5brjzTwXksScUjX80/HMnui5ZlFORGjHebeZG5QVCouZPKBWTWsELGx1iyaw==")
+
+    def test_signature_v1_empty_body(self):
+        string_to_sign_v1 = self.signable.string_to_sign_v1(ADDITIONAL_ATTRIBUTES)
+        tested = self.signer.signature_v1(string_to_sign_v1)
+        self.assertEqual(tested, "UxcRuPRLzjO70NUDG/v71vfs8t/8xyaKN7LTgt6IiV+ul4GRpp3b9EzmF8/b7OTlX3Bsxl7o+E1wfuf4AuqQKE5IqZuhNqZ2t2TPIFdeV4VeF4Eh+gWs6de0KERnEWMTH7OjJsSEQ1gdA7tB3wQhhnf7CpJgMc3P1dSONVgq9qIchspw6L4dadN5bzxH99hN1E/0iPd+qGIeczuhtPMuiNaZRjhFjr2ZsIqn0pYqF+u2czKXd76sZGiBYuUpp/5dQvXBK9v2JlXUmiCoa2LcPj55HR0YEqcPE0mV0k9hyJMwJZeeTKBS5g3QDxoPpB61/+sLuyNp2P/cWrvU03P9dQ==")
+
+    def test_signature_v2_empty_body(self):
+        string_to_sign_v2 = self.signable.string_to_sign_v2(ADDITIONAL_ATTRIBUTES)
+        tested = self.signer.signature_v2(string_to_sign_v2)
+        self.assertEqual(tested, "jDB6fhwUA11ZSLb2W4ueS4l9hsguqmgcRez58kUo25iuMT5Uj9wWz+coHSpOd39B0cNW5D5UY6nWifw4RJIv/q8MdqS43WVgnCDSrNsSxpQ/ic6U3I3151S69PzSRZ+aR/I5A85Q9FgWB6wDNf4iX/BmZopfd5XjsLEyDymTRYedmB4DmONlTrsjVPs1DS2xY5xQyxIcxEUpVGDfTNroRTu5REBTttWbUB7BRXhKCc2pfRnUYPBo4Fa7nM8lI7J1/jUasMMLelr6hvcc6t21RCHhf4p9VlpokUOdN8slXU/kkC+OMUE04I021AUnZSpdhd/IoVR1JJDancBRzWA2HQ==")
