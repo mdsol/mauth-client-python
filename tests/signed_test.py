@@ -26,8 +26,8 @@ class TestSigned(unittest.TestCase):
     def test_from_headers_v1(self):
         signed = Signed.from_headers(X_MWS_HEADERS)
 
-        self.assertEqual(signed.protocol_version, 1)
-        self.assertEqual(signed.signature_time, EPOCH)
+        self.assertEqual(signed.protocol_version(), 1)
+        self.assertEqual(signed.x_mws_time, EPOCH)
         self.assertEqual(signed.token, "MWS")
         self.assertEqual(signed.app_uuid, APP_UUID)
         self.assertEqual(signed.signature, X_MWS_SIGNATURE)
@@ -35,8 +35,8 @@ class TestSigned(unittest.TestCase):
     def test_from_headers_v2(self):
         signed = Signed.from_headers(MWSV2_HEADERS)
 
-        self.assertEqual(signed.protocol_version, 2)
-        self.assertEqual(signed.signature_time, EPOCH)
+        self.assertEqual(signed.protocol_version(), 2)
+        self.assertEqual(signed.mcc_time, EPOCH)
         self.assertEqual(signed.token, "MWSV2")
         self.assertEqual(signed.app_uuid, APP_UUID)
         self.assertEqual(signed.signature, MWSV2_SIGNATURE)
@@ -44,8 +44,8 @@ class TestSigned(unittest.TestCase):
     def test_from_headers_missing_header(self):
         signed = Signed.from_headers({})
 
-        self.assertEqual(signed.protocol_version, None)
-        self.assertEqual(signed.signature_time, "")
+        self.assertEqual(signed.protocol_version(), None)
+        self.assertEqual(signed.mcc_time, "")
         self.assertEqual(signed.token, "")
         self.assertEqual(signed.app_uuid, "")
         self.assertEqual(signed.signature, "")
@@ -54,8 +54,8 @@ class TestSigned(unittest.TestCase):
         bad_header = { "MCC-Time": EPOCH, "MCC-Authentication": X_MWS_AUTHENTICATION }
         signed = Signed.from_headers(bad_header)
 
-        self.assertEqual(signed.protocol_version, None)
-        self.assertEqual(signed.signature_time, "")
+        self.assertEqual(signed.protocol_version(), 2)
+        self.assertEqual(signed.mcc_time, EPOCH)
         self.assertEqual(signed.token, "")
         self.assertEqual(signed.app_uuid, "")
         self.assertEqual(signed.signature, "")
