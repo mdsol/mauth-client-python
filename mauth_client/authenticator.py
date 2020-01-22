@@ -3,7 +3,7 @@ import base64
 import datetime
 import requests
 from .config import Config
-from .consts import MWS_TOKEN
+from .consts import MWS_TOKEN, MWSV2_TOKEN
 from .exceptions import InauthenticError, MAuthNotPresent, MissingV2Error, UnableToAuthenticateError
 from .lambda_helper import generate_mauth
 from .rsa_verifier import RSAVerifier
@@ -45,12 +45,24 @@ class AbstractAuthenticator(ABC):
 
     # raises InauthenticError unless the given object is authentic. Will only
     # authenticate with v2 if the environment variable V2_ONLY_AUTHENTICATE
-    # is set. Otherwise will authenticate with only the highest protocol version present
+    # is set. Otherwise will fallback to v1 when v2 authentication fails
     def _authenticate(self):
-        if self.signed.protocol_version == 2:
-            self._authenticate_v2()
+        if self.signed.protocol_version() == 2:
+            try:
+                self._authenticate_v2()
+            except InauthenticError:
+                if Config.V2_ONLY_AUTHENTICATE:
+                    raise
 
-        elif self.signed.protocol_version == 1:
+                self.signed.fall_back_to_mws_signature_info()
+                if not self.signed.signature:
+                    raise
+
+                self._log_authentication_request()
+                self._authenticate_v1()
+                self.logger.warning("Completed successful authentication attempt after fallback to v1")
+
+        elif self.signed.protocol_version() == 1:
             if Config.V2_ONLY_AUTHENTICATE:
                 # If v2 is required but not present and v1 is present we raise MissingV2Error
                 msg = "This service requires mAuth v2 mcc-authentication header "\
@@ -74,13 +86,13 @@ class AbstractAuthenticator(ABC):
         self._signature_valid_v1()
 
     def _time_valid_v1(self):
-        if not self.signed.signature_time:
+        if not self.signed.x_mws_time:
             raise InauthenticError("Time verification failed. No X-MWS-Time present.")
 
-        if not str(self.signed.signature_time).isdigit():
+        if not str(self.signed.x_mws_time).isdigit():
             raise InauthenticError("Time verification failed. X-MWS-Time header format incorrect.")
 
-        self._time_within_valid_range()
+        self._time_within_valid_range(self.signed.x_mws_time)
 
     def _token_valid_v1(self):
         if not self.signed.token == MWS_TOKEN:
@@ -93,31 +105,35 @@ class AbstractAuthenticator(ABC):
 
     # V2 helpers
     def _authenticate_v2(self):
-        # Since the V2 token is already verified in the Signed class (MWSV2_AUTH_PATTERN),
-        # "_token_valid_v2()" is not defined in this class.
         self._time_valid_v2()
+        self._token_valid_v2()
         self._signature_valid_v2()
 
     def _time_valid_v2(self):
-        if not self.signed.signature_time:
+        if not self.signed.mcc_time:
             raise InauthenticError("Time verification failed. No MCC-Time present.")
 
-        if not str(self.signed.signature_time).isdigit():
+        if not str(self.signed.mcc_time).isdigit():
             raise InauthenticError("Time verification failed. MCC-Time header format incorrect.")
 
-        self._time_within_valid_range()
+        self._time_within_valid_range(self.signed.mcc_time)
+
+    def _token_valid_v2(self):
+        if not self.signed.token == MWSV2_TOKEN:
+            msg = "Token verification failed. Expected {}.".format(MWSV2_TOKEN)
+            raise InauthenticError(msg)
 
     @abstractmethod
     def _signature_valid_v2(self):
         pass
 
-    def _time_within_valid_range(self):
+    def _time_within_valid_range(self, signature_timestamp):
         """
         Is the time of the request within the allowed drift?
         """
         now = datetime.datetime.now()
         # this needs a float
-        signature_time = datetime.datetime.fromtimestamp(float(self.signed.signature_time))
+        signature_time = datetime.datetime.fromtimestamp(float(signature_timestamp))
         if now > signature_time + datetime.timedelta(seconds=self.ALLOWED_DRIFT_SECONDS):
             msg = "Time verification failed. {} not within {}s of {}".format(signature_time,
                                                                              self.ALLOWED_DRIFT_SECONDS,
@@ -144,7 +160,7 @@ class LocalAuthenticator(AbstractAuthenticator):
             self.rsa_verifier = RSAVerifier(self.signed.app_uuid)
 
         expected = self.signable.string_to_sign_v1(
-            { "time": self.signed.signature_time, "app_uuid": self.signed.app_uuid }
+            { "time": self.signed.x_mws_time, "app_uuid": self.signed.app_uuid }
         )
         if not self.rsa_verifier.verify_v1(expected, self.signed.signature):
             msg = "Signature verification failed for {}.".format(self.signable.name)
@@ -155,7 +171,7 @@ class LocalAuthenticator(AbstractAuthenticator):
             self.rsa_verifier = RSAVerifier(self.signed.app_uuid)
 
         expected = self.signable.string_to_sign_v2(
-            { "time": self.signed.signature_time, "app_uuid": self.signed.app_uuid }
+            { "time": self.signed.mcc_time, "app_uuid": self.signed.app_uuid }
         )
         if not self.rsa_verifier.verify_v2(expected, self.signed.signature):
             msg = "Signature verification failed for {}.".format(self.signable.name)
@@ -179,15 +195,15 @@ class RemoteAuthenticator(AbstractAuthenticator):
         super().__init__(signable, signed, logger)
 
     def _signature_valid_v1(self):
-        self._make_mauth_request(self._build_authentication_ticket())
+        self._make_mauth_request(self._build_authentication_ticket(self.signed.x_mws_time))
 
     def _signature_valid_v2(self):
-        self._make_mauth_request(self._build_authentication_ticket({
+        self._make_mauth_request(self._build_authentication_ticket(self.signed.mcc_time, {
             "query_string": self.signable.attributes_for_signing["query_string"],
             "token": self.signed.token
         }))
 
-    def _build_authentication_ticket(self, additional_attributes=None):
+    def _build_authentication_ticket(self, request_time, additional_attributes=None):
         if not additional_attributes:
             additional_attributes = {}
 
@@ -197,7 +213,7 @@ class RemoteAuthenticator(AbstractAuthenticator):
             "app_uuid": self.signed.app_uuid,
             "client_signature": self.signed.signature,
             "request_url": self.signable.attributes_for_signing["request_url"],
-            "request_time": self.signed.signature_time,
+            "request_time": request_time,
             "b64encoded_body": base64.b64encode(binary_body).decode('utf-8'),
             **additional_attributes
         }

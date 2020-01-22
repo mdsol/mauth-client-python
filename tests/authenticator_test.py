@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 import unittest
 import copy
-import requests_mock
+import logging
 from unittest.mock import MagicMock
 from io import StringIO
 from freezegun import freeze_time
-import logging
+import requests_mock
 
 from mauth_client.authenticator import AbstractAuthenticator, LocalAuthenticator, RemoteAuthenticator
 from mauth_client.config import Config
@@ -13,6 +13,8 @@ from mauth_client.signable import RequestSignable
 from mauth_client.signed import Signed
 from mauth_client.key_holder import KeyHolder
 from mauth_client.exceptions import InauthenticError, UnableToAuthenticateError, MAuthNotPresent, MissingV2Error
+
+from mauth_client.consts import X_MWS_AUTH, X_MWS_TIME, MCC_AUTH, MCC_TIME, X_MWS_AUTH_PATTERN, MWSV2_AUTH_PATTERN
 
 from tests.common import load_key
 
@@ -141,14 +143,6 @@ class TestAuthenticator(unittest.TestCase):
                          "Authentication Failed. No mAuth signature present; "
                          "X-MWS-Authentication header is blank, MCC-Authentication header is blank.")
 
-    def test_authenticate_bad_token_in_mcc(self):
-        self.v2_headers["MCC-Authentication"] = "RWS {}:{};".format(APP_UUID, MWSV2_SIGNATURE)
-        with self.assertRaises(MAuthNotPresent) as exc:
-            MockAuthenticator(self.v2_headers)._authenticate()
-        self.assertEqual(str(exc.exception),
-                         "Authentication Failed. No mAuth signature present; "
-                         "X-MWS-Authentication header is blank, MCC-Authentication header is blank.")
-
     def test_time_valid_v1_missing_header(self):
         del self.v1_headers["X-MWS-Time"]
         with self.assertRaises(InauthenticError) as exc:
@@ -195,6 +189,14 @@ class TestAuthenticator(unittest.TestCase):
         self.assertEqual(str(exc.exception),
                          "Time verification failed. MCC-Time header format incorrect.")
 
+    @freeze_time(EPOCH_DATETIME)
+    def test_token_valid_v2_bad_token(self):
+        self.v2_headers["MCC-Authentication"] = "RWS {}:{}".format(APP_UUID, X_MWS_SIGNATURE)
+        with self.assertRaises(InauthenticError) as exc:
+            MockAuthenticator(self.v2_headers)._authenticate()
+        self.assertEqual(str(exc.exception),
+                         "Token verification failed. Expected MWSV2.")
+
     @freeze_time(EPOCH_DATETIME + timedelta(minutes=5, seconds=1))
     def test_time_valid_v2_expired_header(self):
         with self.assertRaises(InauthenticError) as exc:
@@ -204,6 +206,64 @@ class TestAuthenticator(unittest.TestCase):
                          "not within {}s of {}".format(datetime.fromtimestamp(int(EPOCH)),
                                                        MockAuthenticator.ALLOWED_DRIFT_SECONDS,
                                                        datetime.now()))
+
+    @freeze_time(EPOCH_DATETIME)
+    def test_fallback_to_v1_when_v2_fails(self):
+        self.logger.setLevel(logging.INFO)
+        self.mock_authenticator = MockAuthenticator({**self.v2_headers, **self.v1_headers})
+        self.mock_authenticator._signature_valid_v2 = MagicMock(side_effect=InauthenticError("Boom!"))
+        authentic, status, message = self.mock_authenticator.is_authentic()
+
+        self.assertTrue(authentic)
+        self.assertEqual(status, 200)
+        self.assertEqual(message, "")
+
+        self.assertEqual(self.captor.getvalue(),
+                         "Mauth-client attempting to authenticate request from app with mauth" \
+                         " app uuid {app_uuid} to app with mauth app uuid {auth_app_uuid}" \
+                         " using version MWSV2.\n" \
+                         "Mauth-client attempting to authenticate request from app with mauth" \
+                         " app uuid {app_uuid} to app with mauth app uuid {auth_app_uuid}" \
+                         " using version MWS.\n" \
+                         "Completed successful authentication attempt after fallback to v1\n" \
+                         .format(app_uuid=APP_UUID, auth_app_uuid=AUTHENTICATOR_APP_UUID))
+
+    @freeze_time(EPOCH_DATETIME)
+    def test_does_not_fallback_to_v1_when_v2_only_flag_is_true(self):
+        self.logger.setLevel(logging.INFO)
+        self.mock_authenticator = MockAuthenticator({**self.v2_headers, **self.v1_headers}, True)
+        self.mock_authenticator._signature_valid_v2 = MagicMock(side_effect=InauthenticError("Boom!"))
+        authentic, status, message = self.mock_authenticator.is_authentic()
+
+        self.assertFalse(authentic)
+        self.assertEqual(status, 401)
+        self.assertEqual(message, "Boom!")
+
+        self.assertEqual(self.captor.getvalue(),
+                         "Mauth-client attempting to authenticate request from app with mauth" \
+                         " app uuid {app_uuid} to app with mauth app uuid {auth_app_uuid}" \
+                         " using version MWSV2.\n" \
+                         "mAuth signature authentication failed for request. Exception: Boom!\n" \
+                         .format(app_uuid=APP_UUID, auth_app_uuid=AUTHENTICATOR_APP_UUID))
+
+    @freeze_time(EPOCH_DATETIME)
+    def test_does_not_fallback_to_v1_when_v1_signature_is_missing(self):
+        self.logger.setLevel(logging.INFO)
+        del self.v1_headers["X-MWS-Authentication"]
+        self.mock_authenticator = MockAuthenticator({**self.v2_headers, **self.v1_headers})
+        self.mock_authenticator._signature_valid_v2 = MagicMock(side_effect=InauthenticError("Boom!"))
+        authentic, status, message = self.mock_authenticator.is_authentic()
+
+        self.assertFalse(authentic)
+        self.assertEqual(status, 401)
+        self.assertEqual(message, "Boom!")
+
+        self.assertEqual(self.captor.getvalue(),
+                         "Mauth-client attempting to authenticate request from app with mauth" \
+                         " app uuid {app_uuid} to app with mauth app uuid {auth_app_uuid}" \
+                         " using version MWSV2.\n" \
+                         "mAuth signature authentication failed for request. Exception: Boom!\n" \
+                         .format(app_uuid=APP_UUID, auth_app_uuid=AUTHENTICATOR_APP_UUID))
 
 
 class TestLocalAuthenticator(unittest.TestCase):
@@ -265,9 +325,9 @@ class TestLocalAuthenticator(unittest.TestCase):
 
     @freeze_time(EPOCH_DATETIME)
     def test_authentication_v2_happy_path_multiple_versions(self):
-        self.authenticator.signed = Signed.from_headers(self.v2_headers)
         self.v2_headers["MCC-Authentication"] = "RWS {app_uuid}:ABC;{mwsv2_authentication};MWSV3 {app_uuid}:DEF" \
                                                 .format(app_uuid=APP_UUID, mwsv2_authentication=MWSV2_AUTHENTICATION)
+        self.authenticator.signed = Signed.from_headers(self.v2_headers)
         self.assertTrue(self.authenticator._authenticate())
 
     @freeze_time(EPOCH_DATETIME)
@@ -305,7 +365,6 @@ class TestRemoteAuthenticator(unittest.TestCase):
         self.signed = Signed.from_headers(self.v1_headers)
 
         self.authenticator = RemoteAuthenticator(self.signable, self.signed, self.logger)
-        self.maxDiff = None
 
     def test_authenticator_type(self):
         self.assertEqual(self.authenticator.authenticator_type, "REMOTE")
