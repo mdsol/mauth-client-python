@@ -1,3 +1,6 @@
+# 0.5.0
+- Fall back to V1 when V2 authentication fails.
+
 # 0.4.0
 - Add `FlaskAuthenticator` to authenticate requests in Flask applications.
 
