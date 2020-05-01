@@ -74,10 +74,18 @@ class TestFlaskAuthenticator(unittest.TestCase):
         # protected URL
         response = client.get("/")
         self.assertEqual(401, response.status_code)
-        self.assertEqual(dict(errors=dict(mauth=["Authentication Failed. No mAuth signature present; "
-                                                 "X-MWS-Authentication header is blank, "
-                                                 "MCC-Authentication header is blank."])),
-                         json.loads(response.data.decode("utf-8")))
+        self.assertEqual(
+            dict(
+                errors=dict(
+                    mauth=[
+                        "Authentication Failed. No mAuth signature present; "
+                        "X-MWS-Authentication header is blank, "
+                        "MCC-Authentication header is blank."
+                    ]
+                )
+            ),
+            json.loads(response.data.decode("utf-8")),
+        )
 
     def test_app_configuration_and_call_open_url(self):
         authenticator = FlaskAuthenticator()

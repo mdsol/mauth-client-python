@@ -4,13 +4,16 @@ from mauth_client.requests_mauth import MAuth
 
 RSA_PRIVATE_KEY = "RSA PRIVATE KEY"
 
+
 def generate_mauth():
     return MAuth(Config.APP_UUID, _get_private_key())
 
+
 def _get_private_key():
     private_key = Config.PRIVATE_KEY
-    if not RSA_PRIVATE_KEY in private_key:
+    if RSA_PRIVATE_KEY not in private_key:
         import boto3
+
         kms_client = boto3.client("kms")
         private_key = kms_client.decrypt(CiphertextBlob=b64decode(private_key))["Plaintext"].decode("ascii")
 

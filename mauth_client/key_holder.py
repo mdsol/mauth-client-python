@@ -10,6 +10,7 @@ CACHE_MAXSIZE = 128
 CACHE_TTL = 60
 MAX_AGE_REGEX = re.compile(r"max-age=(\d+)")
 
+
 class KeyHolder:
     _CACHE = None
     _MAUTH = None
@@ -17,7 +18,7 @@ class KeyHolder:
 
     @classmethod
     def get_public_key(cls, app_uuid):
-        if not cls._CACHE or not app_uuid in cls._CACHE:
+        if not cls._CACHE or app_uuid not in cls._CACHE:
             cls._set_public_key(app_uuid)
 
         return cls._CACHE.get(app_uuid)
@@ -39,11 +40,7 @@ class KeyHolder:
     @classmethod
     def _get_public_key_and_cache_control_from_mauth(cls, app_uuid):
         if not cls._MAUTH:
-            cls._MAUTH = {
-                "auth": generate_mauth(),
-                "url": Config.MAUTH_URL,
-                "api_version": Config.MAUTH_API_VERSION
-            }
+            cls._MAUTH = {"auth": generate_mauth(), "url": Config.MAUTH_URL, "api_version": Config.MAUTH_API_VERSION}
 
         url = "{}/mauth/{}/security_tokens/{}.json".format(cls._MAUTH["url"], cls._MAUTH["api_version"], app_uuid)
         response = cls._request_session().get(url, auth=cls._MAUTH["auth"])

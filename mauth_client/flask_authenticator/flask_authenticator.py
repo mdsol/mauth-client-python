@@ -15,7 +15,8 @@ class FlaskAuthenticator:
     """
     The MAuth Authenticator instance
     """
-    state_key = 'flask_mauth.client'
+
+    state_key = "flask_mauth.client"
 
     def __init__(self, app=None):
         # backwards compatibility support
@@ -32,17 +33,17 @@ class FlaskAuthenticator:
         """
         self._app = app
         app.authenticator = self
-        app.extensions = getattr(app, 'extensions', {})
+        app.extensions = getattr(app, "extensions", {})
         app.extensions[self.state_key] = self
 
         self._authenticator = self._get_authenticator()
 
     def _get_authenticator(self):
         # Validate the client settings (APP_UUID, PRIVATE_KEY)
-        if None in (Config.APP_UUID, Config.PRIVATE_KEY) or '' in (Config.APP_UUID, Config.PRIVATE_KEY):
+        if None in (Config.APP_UUID, Config.PRIVATE_KEY) or "" in (Config.APP_UUID, Config.PRIVATE_KEY):
             raise TypeError("FlaskAuthenticator requires APP_UUID and PRIVATE_KEY")
         # Validate the mauth settings (MAUTH_BASE_URL, MAUTH_API_VERSION)
-        if None in (Config.MAUTH_URL, Config.MAUTH_API_VERSION) or '' in (Config.MAUTH_URL, Config.MAUTH_API_VERSION):
+        if None in (Config.MAUTH_URL, Config.MAUTH_API_VERSION) or "" in (Config.MAUTH_URL, Config.MAUTH_API_VERSION):
             raise TypeError("FlaskAuthenticator requires MAUTH_URL and MAUTH_API_VERSION")
         # Validate MAUTH_MODE
         if Config.MAUTH_MODE not in ("local", "remote"):
@@ -67,14 +68,14 @@ def requires_authentication(func):
     """
     A Decorator for routes requiring mauth authentication
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         authenticator = current_app.authenticator
         authentic, status, message = authenticator.authenticate(request)
         if not authentic:
             _message = json.dumps(dict(errors=dict(mauth=[message])))
-            return Response(response=_message,
-                            status=status,
-                            mimetype="application/json")
+            return Response(response=_message, status=status, mimetype="application/json")
         return func(*args, **kwargs)
+
     return wrapper
