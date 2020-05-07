@@ -10,10 +10,10 @@ python:
 
 before_install:
   - pip install poetry
+  - pip install tox-travis
 
 install:
   - poetry install -v
-  - pip install tox-travis
 
 stages:
   - lint
