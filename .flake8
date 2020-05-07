@@ -12,5 +12,4 @@ exclude =
     .venv
     .tox
     .pytest_cache
-    .vscode
     .eggs
