@@ -9,6 +9,7 @@ class RSAVerifier:
     """
     Wrapper of the rsa library for verifying
     """
+
     def __init__(self, app_uuid):
         """
         :param app_uuid:
@@ -71,4 +72,4 @@ class RSAVerifier:
         :param padded: padded string
         :rtype: str
         """
-        return padded[padded.index(b'\x00', 2) + 1:]
+        return padded[padded.index(b"\x00", 2) + 1 :]

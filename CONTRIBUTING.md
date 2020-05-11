@@ -16,18 +16,23 @@ To setup your environment:
   ```
 1. Install Pyenv versions for the Tox Suite
   ```bash
-  pyenv install 3.5.7
-  pyenv install 3.6.9
-  pyenv install 3.7.4
-  pyenv install pypy3.6-7.1.1
+  pyenv install 3.5.8
+  pyenv install 3.6.10
+  pyenv install 3.7.7
+  pyenv install 3.8.2
+  pyenv install pypy3.6-7.3.1
+  ```
+1. Install Poetry
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
   ```
 1. Install Tox
   ```bash
-  pip install tox tox-pyenv
+  pip install tox
   ```
 1. Setup the local project versions (one for each env in the `envlist`)
   ```bash
-  pyenv local 3.5.7 3.6.9 3.7.4 pypy3.6-7.1.1
+  pyenv local 3.5.8 3.6.10 3.7.7 3.8.2 pypy3.6-7.1.1
   ```
 
 ## Unit Tests

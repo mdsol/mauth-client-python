@@ -8,6 +8,7 @@ class MAuth(requests.auth.AuthBase):
     """
     Custom requests authorizer for MAuth
     """
+
     def __init__(self, app_uuid, private_key_data, v2_only_sign_requests=Config.V2_ONLY_SIGN_REQUESTS):
         """
         Create a new MAuth Instance
@@ -32,4 +33,4 @@ class MAuth(requests.auth.AuthBase):
         :param requests.models.PreparedRequest request: the Request object
         """
         request_signable = RequestSignable(method=request.method, url=request.url, body=request.body)
-        return { **self.signer.signed_headers(request_signable) }
+        return {**self.signer.signed_headers(request_signable)}

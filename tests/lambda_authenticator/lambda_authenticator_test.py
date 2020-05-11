@@ -11,10 +11,12 @@ CLIENT_APP_UUID = "f5af50b2-bf7d-4c29-81db-76d086d4808a"
 URL = "https://api_gateway.com/sandbox/path"
 X_MWS_TIME = "1500854400"  # 2017-07-24 09:00:00 UTC
 
-SIGNATURE = "p0SNltF6B4G5z+nVNbLv2XCEdouimo/ECQ/Sum6YM+QgE1/LZLXY+hAcwe/TkaC/2d8I3Zot37Xgob3cftgSf9S1fPAi3euN0Fmv/OE" \
-            "kfUmsYvmqyOXawEWGpevoEX6KNpEAUrt48hFGomsWRgbEEjuUtN4iiPe9y3HlIjumUmDrM499RZxgZdyOhqtLVOv5ngNShDbFv2LljI" \
-            "Tl4sO0f7zU8wAYGfxLEPXvp8qgnzQ6usZwrD2ujSmXbZtksqgG1R0Vmb7LAd6P+uvtRkw8kGLz/wWwxRweSGliX/IwovGi/bMIIClDD" \
-            "faUAY9QDjcU1x7i0Yy1IEyQYyCWcnL1rA=="
+SIGNATURE = (
+    "p0SNltF6B4G5z+nVNbLv2XCEdouimo/ECQ/Sum6YM+QgE1/LZLXY+hAcwe/TkaC/2d8I3Zot37Xgob3cftgSf9S1fPAi3euN0Fmv/OE"
+    "kfUmsYvmqyOXawEWGpevoEX6KNpEAUrt48hFGomsWRgbEEjuUtN4iiPe9y3HlIjumUmDrM499RZxgZdyOhqtLVOv5ngNShDbFv2LljI"
+    "Tl4sO0f7zU8wAYGfxLEPXvp8qgnzQ6usZwrD2ujSmXbZtksqgG1R0Vmb7LAd6P+uvtRkw8kGLz/wWwxRweSGliX/IwovGi/bMIIClDD"
+    "faUAY9QDjcU1x7i0Yy1IEyQYyCWcnL1rA=="
+)
 
 X_MWS_AUTHENTICATION = "MWS {}:{}".format(CLIENT_APP_UUID, SIGNATURE)
 HEADERS = {"X-Mws-Time": X_MWS_TIME, "X-Mws-Authentication": X_MWS_AUTHENTICATION}
@@ -49,7 +51,9 @@ class TestLambdaAuthenticator(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(message, "")
 
-        self.assertEqual(self.captor.getvalue(),
-                         "Mauth-client attempting to authenticate request from app with mauth" \
-                         " app uuid {} to app with mauth app uuid {}" \
-                         " using version MWS.\n".format(CLIENT_APP_UUID, LAMBDA_APP_UUID))
+        self.assertEqual(
+            self.captor.getvalue(),
+            "Mauth-client attempting to authenticate request from app with mauth"
+            " app uuid {} to app with mauth app uuid {}"
+            " using version MWS.\n".format(CLIENT_APP_UUID, LAMBDA_APP_UUID),
+        )

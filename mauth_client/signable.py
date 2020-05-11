@@ -8,13 +8,14 @@ class Signable(ABC):
     """
     Makes a signature string to sign
     """
+
     def __init__(self, **kwargs):
         """
         Create a new Signable instance
 
         :param dict attributes_for_signing: Attributes to generate a signature string
         """
-        self.name = self. __class__.__name__.replace("Signable", "").lower()
+        self.name = self.__class__.__name__.replace("Signable", "").lower()
         self.attributes_for_signing = self.build_attributes(**kwargs)
 
     def string_to_sign_v1(self, override_attributes):
@@ -34,7 +35,7 @@ class Signable(ABC):
 
         :param dict override_attributes: Additional attributes to generate a signature string
         """
-        attributes_for_signing = { **self.attributes_for_signing, **override_attributes }
+        attributes_for_signing = {**self.attributes_for_signing, **override_attributes}
         missing_attributes = [
             k for k in self.SIGNATURE_COMPONENTS if (not attributes_for_signing.get(k) and k != "body")
         ]
@@ -69,7 +70,7 @@ class Signable(ABC):
             body_digest = hexdigest(self.attributes_for_signing.get("body", ""))
             self.attributes_for_signing["body_digest"] = body_digest
 
-        attrs_with_overrides = { **self.attributes_for_signing, **override_attributes }
+        attrs_with_overrides = {**self.attributes_for_signing, **override_attributes}
         encoded_query_params = self.encode_query_string(attrs_with_overrides.get("query_string"))
         attrs_with_overrides["encoded_query_params"] = encoded_query_params
 
@@ -115,15 +116,11 @@ class RequestSignable(Signable):
     """
     Makes a signature string for signing a request
     """
+
     SIGNATURE_COMPONENTS = ["verb", "request_url", "body", "app_uuid", "time"]
     SIGNATURE_COMPONENTS_V2 = ["verb", "request_url", "body_digest", "app_uuid", "time", "encoded_query_params"]
 
     def build_attributes(self, **kwargs):
         body = kwargs.get("body") or ""
         parsed = urlparse(kwargs.get("url"), allow_fragments=False)
-        return {
-            "verb": kwargs.get("method"),
-            "request_url": parsed.path,
-            "query_string": parsed.query,
-            "body": body
-        }
+        return {"verb": kwargs.get("method"), "request_url": parsed.path, "query_string": parsed.query, "body": body}

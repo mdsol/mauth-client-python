@@ -11,6 +11,7 @@ class RSASigner:
     """
     Wrapper of the rsa library for signing
     """
+
     def __init__(self, private_key_data):
         """
         :param private_key_data:
@@ -74,12 +75,10 @@ class RSASigner:
         msglength = len(message)
 
         if msglength > max_msglength:  # pragma: no cover
-            raise OverflowError("%i bytes needed for message, but there is only"
-                                " space for %i" % (msglength, max_msglength))
+            raise OverflowError(
+                "%i bytes needed for message, but there is only" " space for %i" % (msglength, max_msglength)
+            )
 
         padding_length = target_length - msglength - 3
 
-        return b"".join([b"\x00\x01",
-                         padding_length * b"\xff",
-                         b"\x00",
-                         message])
+        return b"".join([b"\x00\x01", padding_length * b"\xff", b"\x00", message])
