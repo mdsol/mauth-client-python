@@ -12,13 +12,15 @@ before_install:
   - pip install poetry
   - pip install tox-travis
 
-install:
-  - poetry install -v
+install: poetry install -v
+
+script: tox
 
 stages:
   - lint
   - test
-  - deploy
+  - name: publish
+    if: tag IS present
 
 jobs:
   include:
@@ -27,18 +29,14 @@ jobs:
       script:
         - poetry run flake8 --version
         - poetry run flake8
-
-script:
-  - tox
-
-before_deploy:
-  - poetry config repositories.mdsol https://mdsol.jfrog.io/mdsol/api/pypi/pypi-local
-  - poetry config http-basic.mdsol $ARTIFACTORY_USERNAME $ARTIFACTORY_PASSWORD # Stored as Travis CI Environment Vars
-  - poetry build
-
-deploy:
-  provider: script
-  script: poetry publish -r mdsol
-  on:
-    tags: true
-    python: 3.8
+    - stage: publish
+      python: 3.8
+      script: skip
+      before_deploy:
+        - poetry config repositories.mdsol https://mdsol.jfrog.io/mdsol/api/pypi/pypi-local
+        - poetry config http-basic.mdsol $ARTIFACTORY_USERNAME $ARTIFACTORY_PASSWORD # Stored as Travis CI Environment Vars
+        - poetry build
+      deploy:
+        provider: script
+        script: poetry publish -r mdsol
+        skip_cleanup: true
