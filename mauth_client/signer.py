@@ -3,6 +3,7 @@ from .rsa_signer import RSASigner
 from .consts import AUTH_HEADER_DELIMITER, MWS_TOKEN, X_MWS_AUTH, X_MWS_TIME, MWSV2_TOKEN, MCC_AUTH, MCC_TIME
 from .utils import base64_encode
 
+
 class Signer:
     """
     methods to sign requests.
@@ -28,7 +29,7 @@ class Signer:
             return self.signed_headers_v2(signable, attributes)
 
         # by default sign with both the v1 and v2 protocol
-        return { **self.signed_headers_v1(signable, attributes), **self.signed_headers_v2(signable, attributes) }
+        return {**self.signed_headers_v1(signable, attributes), **self.signed_headers_v2(signable, attributes)}
 
     def signed_headers_v1(self, signable, attributes=None):
         override_attributes = self._build_override_attributes(attributes)
@@ -36,7 +37,7 @@ class Signer:
 
         return {
             X_MWS_AUTH: "{} {}:{}".format(MWS_TOKEN, self.app_uuid, signature),
-            X_MWS_TIME: override_attributes.get("time")
+            X_MWS_TIME: override_attributes.get("time"),
         }
 
     def signed_headers_v2(self, signable, attributes=None):
@@ -45,7 +46,7 @@ class Signer:
 
         return {
             MCC_AUTH: "{} {}:{}{}".format(MWSV2_TOKEN, self.app_uuid, signature, AUTH_HEADER_DELIMITER),
-            MCC_TIME: override_attributes.get("time")
+            MCC_TIME: override_attributes.get("time"),
         }
 
     def signature_v1(self, string_to_sign):
@@ -58,4 +59,4 @@ class Signer:
         if not attributes:
             attributes = {}
 
-        return { "time": str(int(time.time())), "app_uuid": self.app_uuid, **attributes }
+        return {"time": str(int(time.time())), "app_uuid": self.app_uuid, **attributes}

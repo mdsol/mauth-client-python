@@ -1,5 +1,6 @@
 from .consts import X_MWS_AUTH, X_MWS_TIME, MCC_AUTH, MCC_TIME, X_MWS_AUTH_PATTERN, MWSV2_AUTH_PATTERN
 
+
 class Signed:
     """
     Extracts signature information from an incoming object.
@@ -7,6 +8,7 @@ class Signed:
     mauth_client will authenticate with the highest protocol version present and if authentication fails,
     will fallback to lower protocol versions (if provided).
     """
+
     def __init__(self, x_mws_authentication, x_mws_time, mcc_authentication, mcc_time):
         self.x_mws_authentication = x_mws_authentication
         self.x_mws_time = x_mws_time
@@ -21,7 +23,7 @@ class Signed:
             self.build_signature_info()
 
     def build_signature_info(self, match_data=None):
-        self.token, self.app_uuid, self.signature = (match_data.groups() if match_data else ("", "", ""))
+        self.token, self.app_uuid, self.signature = match_data.groups() if match_data else ("", "", "")
 
     def fall_back_to_mws_signature_info(self):
         self.build_signature_info(self.x_mws_data())
@@ -43,5 +45,5 @@ class Signed:
 
     @classmethod
     def from_headers(cls, headers):
-        lowercased_headers = { k.lower(): v for k, v in headers.items() }
+        lowercased_headers = {k.lower(): v for k, v in headers.items()}
         return cls(*(lowercased_headers.get(k.lower(), "") for k in [X_MWS_AUTH, X_MWS_TIME, MCC_AUTH, MCC_TIME]))

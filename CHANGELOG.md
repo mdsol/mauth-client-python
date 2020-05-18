@@ -1,3 +1,8 @@
+# 1.0.0
+- Add parsing code to test with mauth-protocol-test-suite.
+- Add unescape step in query_string encoding in order to remove "double encoding".
+- Add normalization of paths.
+
 # 0.5.0
 - Fall back to V1 when V2 authentication fails.
 

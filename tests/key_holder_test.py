@@ -10,30 +10,27 @@ from mauth_client.key_holder import KeyHolder
 from mauth_client.exceptions import InauthenticError
 from .common import load_key
 
-APP_UUID = 'f5af50b2-bf7d-4c29-81db-76d086d4808a'
-MAUTH_URL = 'https://mauth.com'
+APP_UUID = "f5af50b2-bf7d-4c29-81db-76d086d4808a"
+MAUTH_URL = "https://mauth.com"
 MAUTH_API_VERSION = "v1"
-MAUTH_PATH = '{}/mauth/v1/security_tokens/{}.json'.format(MAUTH_URL, APP_UUID)
-PUBLIC_KEY = load_key('rsapub')
+MAUTH_PATH = "{}/mauth/v1/security_tokens/{}.json".format(MAUTH_URL, APP_UUID)
+PUBLIC_KEY = load_key("rsapub")
 
 MAUTH_RESPONSE = {
-    'security_token': {
-        'app_name': 'awesome-app-sandbox',
-        'app_uuid': APP_UUID,
-        'public_key_str': PUBLIC_KEY,
-        'created_at': '2016-10-21T21:16:14Z'
+    "security_token": {
+        "app_name": "awesome-app-sandbox",
+        "app_uuid": APP_UUID,
+        "public_key_str": PUBLIC_KEY,
+        "created_at": "2016-10-21T21:16:14Z",
     }
 }
 
-CACHE_CONTROL = 'max-age=60, private'
+CACHE_CONTROL = "max-age=60, private"
+
 
 class TestKeyHolder(unittest.TestCase):
     def setUp(self):
-        KeyHolder._MAUTH = {
-            "auth": MagicMock(),
-            "url": MAUTH_URL,
-            "api_version": MAUTH_API_VERSION
-        }
+        KeyHolder._MAUTH = {"auth": MagicMock(), "url": MAUTH_URL, "api_version": MAUTH_API_VERSION}
 
         # redirect the output of stdout to self.captor
         self.captor = StringIO()
@@ -54,14 +51,14 @@ class TestKeyHolder(unittest.TestCase):
     def test_get_request_respect_cache_header(self):
         KeyHolder._CACHE = None
         with requests_mock.mock() as requests:
-            requests.get(MAUTH_PATH, text=json.dumps(MAUTH_RESPONSE), headers={'Cache-Control': CACHE_CONTROL})
+            requests.get(MAUTH_PATH, text=json.dumps(MAUTH_RESPONSE), headers={"Cache-Control": CACHE_CONTROL})
             self.assertEqual(KeyHolder.get_public_key(APP_UUID), PUBLIC_KEY)
             self.assertEqual(KeyHolder._CACHE.ttl, 60)
 
     def test_get_request_cache_expiration(self):
         KeyHolder._CACHE = None
         with requests_mock.mock() as requests:
-            requests.get(MAUTH_PATH, text=json.dumps(MAUTH_RESPONSE), headers={'Cache-Control': CACHE_CONTROL})
+            requests.get(MAUTH_PATH, text=json.dumps(MAUTH_RESPONSE), headers={"Cache-Control": CACHE_CONTROL})
             self.assertEqual(KeyHolder.get_public_key(APP_UUID), PUBLIC_KEY)
             KeyHolder._CACHE.expire(KeyHolder._CACHE.timer() + 60)
             self.assertEqual(KeyHolder._CACHE.get(APP_UUID), None)
@@ -73,6 +70,5 @@ class TestKeyHolder(unittest.TestCase):
             with self.assertRaises(InauthenticError) as exc:
                 KeyHolder.get_public_key(APP_UUID)
             self.assertEqual(
-                str(exc.exception),
-                'Failed to fetch the public key for {} from {}'.format(APP_UUID, MAUTH_URL)
+                str(exc.exception), "Failed to fetch the public key for {} from {}".format(APP_UUID, MAUTH_URL)
             )
