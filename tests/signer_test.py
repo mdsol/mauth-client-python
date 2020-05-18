@@ -111,8 +111,8 @@ class SignerTest(unittest.TestCase):
         tested = self.signer.signature_v2(string_to_sign_v2)
         self.assertEqual(
             tested,
-            "kXMtivUVa2aciWcHpxWNFtIAKGHkbC2LjvQCYx5llhhiZOfFQOWNyEcy3qdHj03g27FhefGeMNke/4PThXVRD0fg06Kn+wSCZp+ZHTxUp9"
-            "m1ZDjlAaNGYjS+LMkQs2oxwg/iJFFAAzvjxzZ9jIhinWM6+PXok5NfU2rvbjjaI5WfRZa8wNl0NeOYlBZPICTcARbT1G6Kr3bjkgBTixNY"
-            "2dSR1s7MmvpPHzfWSAyaYFppWnJwstRAU/JsR/JzcATZNx/CIk8N+46aWN1Na5avQgLFoNJn6eenXW3W51cENQyhtw7jatvrIKnVckAMoO"
-            "kygfkbHdCixNfV5G0u1LHU3w==",
+            "kNmQchPnfSZOo29GHHDcp+res452+IIiWK/h7HmPdFsTU510X+eWPLaYONmfd2fMAuVLncDAiOPxyOS4WXap69szL37k9537ujnEU15I+j"
+            "+vINTspCnAIbtZ9ia35c+gQyPgNQo7F1RxNl1P3hfXJ4qNXIrMSc/DlKpieNzmXQFPFs9zZxK5VPvdS0QBsuQFSMN71o2Rupf+NRStxvH5"
+            "5pVej/mjJj4PbeCgAX2N6Vi0dqU2GLgcx+0U5j5FphLUIdqF6/6FKRqPRSCLX5hEyFf2c4stRnNWSpP/y/gGFtdIVxFzKEe42cL3FmYSM4"
+            "YFTKn3wGgViw0W+CzkbDXJqQ==",
         )

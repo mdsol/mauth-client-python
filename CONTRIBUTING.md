@@ -39,3 +39,12 @@ To setup your environment:
 
 1. Make any changes, update the tests and then run tests with `tox`
 1. Coverage report can be viewed using `open htmlcov/index.html`
+
+
+## Running mauth-protocol-test-suite
+
+To run the mauth-protocol-test-suite clone the latest test suite onto your machine and place it in the [`tests`](./tests) directory (or supply the ENV var `TEST_SUITE_RELATIVE_PATH` with the path to the test suite relative to the `tests` directory). Then run:
+
+```
+poetry run pytest -m protocol_suite
+```

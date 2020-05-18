@@ -26,6 +26,7 @@ BODY = "こんにちはÆ"
 class TestLambdaAuthenticator(unittest.TestCase):
     def setUp(self):
         Config.APP_UUID = LAMBDA_APP_UUID
+        Config.MAUTH_MODE = "local"
         self.lambda_authenticator = LambdaAuthenticator("POST", URL, HEADERS, BODY)
 
         # redirect the output of stdout to self.captor

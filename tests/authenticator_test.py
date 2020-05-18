@@ -74,6 +74,9 @@ class TestAuthenticator(unittest.TestCase):
 
         self.mock_authenticator = None
 
+    def tearDown(self):
+        Config.V2_ONLY_AUTHENTICATE = False
+
     def test_is_authentic(self):
         self.logger.setLevel(logging.INFO)
         self.mock_authenticator = MockAuthenticator(self.v1_headers)
