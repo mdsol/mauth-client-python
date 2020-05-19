@@ -9,15 +9,15 @@ class MAuth(requests.auth.AuthBase):
     Custom requests authorizer for MAuth
     """
 
-    def __init__(self, app_uuid, private_key_data, v2_only_sign_requests=Config.V2_ONLY_SIGN_REQUESTS):
+    def __init__(self, app_uuid, private_key_data, sign_versions=Config.SIGN_VERSIONS):
         """
         Create a new MAuth Instance
 
         :param str app_uuid: The Application UUID (or APP_UUID) for the application
         :param str private_key_data: Content of the Private Key File
-        :param bool v2_only_sign_requests: Flag to sign requests with only V2
+        :param str sign_versions: Comma-separated protocol versions to sign requests
         """
-        self.signer = Signer(app_uuid, private_key_data, v2_only_sign_requests)
+        self.signer = Signer(app_uuid, private_key_data, sign_versions)
 
     def __call__(self, request):
         """Call override, the entry point for a custom auth object

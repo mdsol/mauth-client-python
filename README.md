@@ -66,17 +66,17 @@ if result.status_code == 200:
 print(result.text)
 ```
 
-The `v2_only_sign_requests` flag can be set as an environment variable to sign outgoing requests with only the V2 protocol:
+The `mauth_sign_versions` option can be set as an environment variable to specify protocol versions to sign outgoing requests:
 
-| Key                     | Value                                                           |
-| ----------------------- | --------------------------------------------------------------- |
-| `V2_ONLY_SIGN_REQUESTS` | **(optional)** Sign requests with only V2. Defaults to `False`. |
+| Key                   | Value                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| `MAUTH_SIGN_VERSIONS` | **(optional)** Comma-separated protocol versions to sign requests. Defaults to `v1`. |
 
-This flag can also be passed to the constructor:
+This option can also be passed to the constructor:
 
 ```python
-v2_only_sign_requests = True
-mauth = MAuth(APP_UUID, private_key, v2_only_sign_requests)
+mauth_sign_versions = "v1,v2"
+mauth = MAuth(APP_UUID, private_key, mauth_sign_versions)
 ```
 
 
