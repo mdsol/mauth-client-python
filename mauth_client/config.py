@@ -8,4 +8,4 @@ class Config:
     MAUTH_MODE = os.environ.get("MAUTH_MODE", "local")
     PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
     V2_ONLY_AUTHENTICATE = str(os.environ.get("V2_ONLY_AUTHENTICATE")).lower() == "true"
-    SIGN_VERSIONS = os.environ.get("MAUTH_SIGN_VERSIONS", "v1")
+    SIGN_VERSIONS = os.environ.get("MAUTH_SIGN_VERSIONS", "v2")
