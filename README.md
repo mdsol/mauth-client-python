@@ -70,7 +70,7 @@ The `mauth_sign_versions` option can be set as an environment variable to specif
 
 | Key                   | Value                                                                                |
 | --------------------- | ------------------------------------------------------------------------------------ |
-| `MAUTH_SIGN_VERSIONS` | **(optional)** Comma-separated protocol versions to sign requests. Defaults to `v1`. |
+| `MAUTH_SIGN_VERSIONS` | **(optional)** Comma-separated protocol versions to sign requests. Defaults to `v2`. |
 
 This option can also be passed to the constructor:
 
