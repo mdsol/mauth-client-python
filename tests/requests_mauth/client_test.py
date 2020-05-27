@@ -22,14 +22,19 @@ class MAuthBaseTest(unittest.TestCase):
             self.example_private_key = key_file.read()
 
     def test_call(self):
-        auth = MAuth(APP_UUID, self.example_private_key)
+        auth = MAuth(APP_UUID, self.example_private_key, "v1,v2")
         request = Request("GET", URL, auth=auth).prepare()
         self.assertEqual(
             sorted(list(request.headers.keys())),
             ["MCC-Authentication", "MCC-Time", "X-MWS-Authentication", "X-MWS-Time"],
         )
 
+    def test_call_v1_only(self):
+        auth = MAuth(APP_UUID, self.example_private_key, "v1")
+        request = Request("GET", URL, auth=auth).prepare()
+        self.assertEqual(sorted(list(request.headers.keys())), ["X-MWS-Authentication", "X-MWS-Time"])
+
     def test_call_v2_only(self):
-        auth = MAuth(APP_UUID, self.example_private_key, True)
+        auth = MAuth(APP_UUID, self.example_private_key)
         request = Request("GET", URL, auth=auth).prepare()
         self.assertEqual(sorted(list(request.headers.keys())), ["MCC-Authentication", "MCC-Time"])

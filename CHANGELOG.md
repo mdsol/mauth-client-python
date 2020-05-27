@@ -1,3 +1,6 @@
+# 1.1.0
+- Replace `V2_ONLY_SIGN_REQUESTS` option with `MAUTH_SIGN_VERSIONS` option and change the default to `v2` only.
+
 # 1.0.0
 - Add parsing code to test with mauth-protocol-test-suite.
 - Add unescape step in query_string encoding in order to remove "double encoding".

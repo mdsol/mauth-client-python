@@ -24,9 +24,10 @@ REQUEST_ATTRIBUTES_WITH_BINARY_BODY = {
 class SignerTest(unittest.TestCase):
     def setUp(self):
         with open(os.path.join(os.path.dirname(__file__), "keys", "test_mauth.priv.key"), "r") as key_file:
-            private_key = key_file.read()
-        self.signer = Signer(APP_UUID, private_key)
-        self.signer_v2_only = Signer(APP_UUID, private_key, True)
+            self.private_key = key_file.read()
+        self.signer = Signer(APP_UUID, self.private_key, "v1,v2")
+        self.signer_v1_only = Signer(APP_UUID, self.private_key, "v1")
+        self.signer_v2_only = Signer(APP_UUID, self.private_key, "v2")
         self.signable = RequestSignable(**REQUEST_ATTRIBUTES)
         self.signable_with_binary_body = RequestSignable(**REQUEST_ATTRIBUTES_WITH_BINARY_BODY)
 
@@ -45,6 +46,15 @@ class SignerTest(unittest.TestCase):
         self.assertRegex(signed_headers["MCC-Authentication"], expected["MCC-Authentication"])
         self.assertEqual(signed_headers["X-MWS-Time"], expected["X-MWS-Time"])
         self.assertEqual(signed_headers["MCC-Time"], expected["MCC-Time"])
+
+    @freeze_time(EPOCH_DATETIME)
+    def test_signed_headers_v1_only(self):
+        expected = {"X-MWS-Authentication": r"\AMWS {}:".format(APP_UUID), "X-MWS-Time": EPOCH}
+
+        signed_headers = self.signer_v1_only.signed_headers(self.signable, ADDITIONAL_ATTRIBUTES)
+        self.assertEqual(signed_headers.keys(), expected.keys())
+        self.assertRegex(signed_headers["X-MWS-Authentication"], expected["X-MWS-Authentication"])
+        self.assertEqual(signed_headers["X-MWS-Time"], expected["X-MWS-Time"])
 
     @freeze_time(EPOCH_DATETIME)
     def test_signed_headers_v2_only(self):
@@ -115,4 +125,15 @@ class SignerTest(unittest.TestCase):
             "+vINTspCnAIbtZ9ia35c+gQyPgNQo7F1RxNl1P3hfXJ4qNXIrMSc/DlKpieNzmXQFPFs9zZxK5VPvdS0QBsuQFSMN71o2Rupf+NRStxvH5"
             "5pVej/mjJj4PbeCgAX2N6Vi0dqU2GLgcx+0U5j5FphLUIdqF6/6FKRqPRSCLX5hEyFf2c4stRnNWSpP/y/gGFtdIVxFzKEe42cL3FmYSM4"
             "YFTKn3wGgViw0W+CzkbDXJqQ==",
+        )
+
+    def test_sign_versions(self):
+        signer = Signer(APP_UUID, self.private_key, "v1, V2,v777")
+        self.assertEqual(signer.sign_versions, ["v1", "v2", "v777"])
+
+    def test_sign_versions_bad_version(self):
+        with self.assertRaises(ValueError) as exc:
+            Signer(APP_UUID, self.private_key, "v1,vv2")
+        self.assertEqual(
+            str(exc.exception), "SIGN_VERSIONS must be comma-separated MAuth protocol versions (e.g. 'v1,v2')"
         )
