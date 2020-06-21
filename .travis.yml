@@ -40,3 +40,6 @@ jobs:
         provider: script
         script: poetry publish -r mdsol
         skip_cleanup: true
+        on:
+          tags: true
+          all_branches: true
