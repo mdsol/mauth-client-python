@@ -1,3 +1,6 @@
+# 1.2.0
+- Change the default signing versions (`MAUTH_SIGN_VERSIONS` option) to `v1` only.
+
 # 1.1.0
 - Replace `V2_ONLY_SIGN_REQUESTS` option with `MAUTH_SIGN_VERSIONS` option and change the default to `v2` only.
 
