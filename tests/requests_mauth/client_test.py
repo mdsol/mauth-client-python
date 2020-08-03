@@ -30,11 +30,11 @@ class MAuthBaseTest(unittest.TestCase):
         )
 
     def test_call_v1_only(self):
-        auth = MAuth(APP_UUID, self.example_private_key, "v1")
+        auth = MAuth(APP_UUID, self.example_private_key)
         request = Request("GET", URL, auth=auth).prepare()
         self.assertEqual(sorted(list(request.headers.keys())), ["X-MWS-Authentication", "X-MWS-Time"])
 
     def test_call_v2_only(self):
-        auth = MAuth(APP_UUID, self.example_private_key)
+        auth = MAuth(APP_UUID, self.example_private_key, "v2")
         request = Request("GET", URL, auth=auth).prepare()
         self.assertEqual(sorted(list(request.headers.keys())), ["MCC-Authentication", "MCC-Time"])
