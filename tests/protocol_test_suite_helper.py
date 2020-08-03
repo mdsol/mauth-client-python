@@ -31,7 +31,7 @@ class ProtocolTestSuiteHelper:
 
         self.request_time = datetime.fromtimestamp(float(config["request_time"]))
         self.app_uuid = config["app_uuid"]
-        self.signer = Signer(config["app_uuid"], private_key)
+        self.signer = Signer(config["app_uuid"], private_key, "v2")
         self.additional_attributes = {"app_uuid": config["app_uuid"], "time": config["request_time"]}
 
     def cases(self):
