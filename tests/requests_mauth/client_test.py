@@ -18,7 +18,7 @@ class RequestMock:
 
 class MAuthBaseTest(unittest.TestCase):
     def setUp(self):
-        with open(os.path.join(os.path.dirname(__file__), "..", "keys", "test_mauth.priv.key"), "r") as key_file:
+        with open(os.path.join(os.path.dirname(__file__), "..", "keys", "fake_mauth.priv.key"), "r") as key_file:
             self.example_private_key = key_file.read()
 
     def test_call(self):
