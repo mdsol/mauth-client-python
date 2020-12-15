@@ -35,16 +35,31 @@ To setup your environment:
   pyenv local 3.5.8 3.6.10 3.7.7 3.8.2 pypy3.6-7.1.1
   ```
 
+
+## Cloning the Repo
+
+This repo contains the submodule `mauth-protocol-test-suite` so requires a flag when initially cloning in order to clone and init submodules.
+
+With Git >= 2.13:
+```sh
+git clone --recurse-submodules git@github.com:mdsol/mauth-client-python.git
+```
+
+With Git < 2.13:
+```sh
+git clone --recursive git@github.com:mdsol/mauth-client-python.git
+```
+
+If you have already cloned before the submodule was introduced, then run:
+```sh
+cd tests/mauth-protocol-test-suite
+git submodule update --init
+```
+
+to init the submodule.
+
+
 ## Unit Tests
 
 1. Make any changes, update the tests and then run tests with `tox`
 1. Coverage report can be viewed using `open htmlcov/index.html`
-
-
-## Running mauth-protocol-test-suite
-
-To run the mauth-protocol-test-suite clone the latest test suite onto your machine and place it in the [`tests`](./tests) directory (or supply the ENV var `TEST_SUITE_RELATIVE_PATH` with the path to the test suite relative to the `tests` directory). Then run:
-
-```
-poetry run pytest -m protocol_suite
-```
