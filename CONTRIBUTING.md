@@ -38,16 +38,9 @@ To setup your environment:
 
 ## Cloning the Repo
 
-This repo contains the submodule `mauth-protocol-test-suite` so requires a flag when initially cloning in order to clone and init submodules.
-
-With Git >= 2.13:
+This repo contains the submodule `mauth-protocol-test-suite` so requires a flag when initially cloning in order to clone and init submodules:
 ```sh
 git clone --recurse-submodules git@github.com:mdsol/mauth-client-python.git
-```
-
-With Git < 2.13:
-```sh
-git clone --recursive git@github.com:mdsol/mauth-client-python.git
 ```
 
 If you have already cloned before the submodule was introduced, then run:
