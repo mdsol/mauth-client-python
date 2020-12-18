@@ -8,7 +8,7 @@ import json
 
 from mauth_client.signer import Signer
 
-TEST_SUITE_RELATIVE_PATH = os.environ.get("TEST_SUITE_RELATIVE_PATH", "mauth-protocol-test-suite")
+TEST_SUITE_RELATIVE_PATH = "mauth-protocol-test-suite"
 MAUTH_PROTOCOL_DIR = os.path.join(os.path.dirname(__file__), TEST_SUITE_RELATIVE_PATH)
 CASE_PATH = os.path.join(MAUTH_PROTOCOL_DIR, "protocols/MWSV2")
 

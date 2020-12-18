@@ -1,4 +1,3 @@
-import pytest
 import unittest
 from unittest.mock import MagicMock
 from freezegun import freeze_time
@@ -23,7 +22,6 @@ class ProtocolTestSuiteTest(unittest.TestCase):
         # reset the KeyHolder.get_public_key method
         KeyHolder.get_public_key = self.__get_public_key__
 
-    @pytest.mark.protocol_suite
     @freeze_time(TEST_SUITE.request_time)
     def test_protocol_test_suite(self):
         for case_path in TEST_SUITE.cases():
