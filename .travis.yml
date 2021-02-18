@@ -3,11 +3,10 @@ language: python
 cache: pip
 
 python:
-  - 3.5
   - 3.6
   - 3.7
   - 3.8
-  - pypy3
+  - 3.9
 
 before_install:
   - pip install poetry
@@ -34,12 +33,11 @@ jobs:
       python: 3.8
       script: skip
       before_deploy:
-        - poetry config repositories.mdsol https://mdsol.jfrog.io/mdsol/api/pypi/pypi-local
-        - poetry config http-basic.mdsol $ARTIFACTORY_USERNAME $ARTIFACTORY_PASSWORD # Stored as Travis CI Environment Vars
+        - poetry config pypi-token.pypi $POETRY_PYPI_TOKEN_PYPI  # this may be unnecessary
         - poetry build
       deploy:
         provider: script
-        script: poetry publish -r mdsol
+        script: poetry publish
         skip_cleanup: true
         on:
           tags: true

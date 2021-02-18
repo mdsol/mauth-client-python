@@ -1,3 +1,8 @@
+# 1.2.1
+- Add autodeploy to PyPI
+- Remove Support for EOL Python 3.5
+- Remove PyPy support
+
 # 1.2.0
 - Change the default signing versions (`MAUTH_SIGN_VERSIONS` option) to `v1` only.
 
