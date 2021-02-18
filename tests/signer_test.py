@@ -23,7 +23,7 @@ REQUEST_ATTRIBUTES_WITH_BINARY_BODY = {
 
 class SignerTest(unittest.TestCase):
     def setUp(self):
-        with open(os.path.join(os.path.dirname(__file__), "keys", "test_mauth.priv.key"), "r") as key_file:
+        with open(os.path.join(os.path.dirname(__file__), "keys", "fake_mauth.priv.key"), "r") as key_file:
             self.private_key = key_file.read()
         self.signer = Signer(APP_UUID, self.private_key, "v1,v2")
         self.signer_v1_only = Signer(APP_UUID, self.private_key, "v1")
@@ -69,40 +69,40 @@ class SignerTest(unittest.TestCase):
         tested = self.signer.signature_v1("Hello world")
         self.assertEqual(
             tested,
-            "F/GAuGYEykrtrmIE/XtETSi0QUoKxUwwTXljT1tUiqNHmyH2NRhKQ1flqusaB7H6bwPBb+FzXzfmiO32lJs6SxMjltqM/FjwucVNhn1BW+"
-            "KXFnZniPh3M0+FwwspksX9xc/KcWEPebtIIEM5cX2rBl43xlvwYtS/+D+obo1AVPv2l5qd+Gwl9b61kYF/aoPGx+bVnmWZK8e8BZxZOjjG"
-            "jmQAOYRYgGWzolLLnzIZ6xy6efY3D9jPXXDqgnqWQvwLStkKJIydrkXUTd0m36X6mD00qHgI7xoYSLgqxNSg1EgO8yuette8BKl9D+YbIE"
-            "J3xFnaZmCfVGks0M9tmZ2PXg==",
+            "1oTyoecqng4TE7ycGoW6qFMSPpA4C9TiZVDANHN4T/76LxtcCqmTTn9VCsVIDRWGKl3O5EzJEUYIfbI2QjsMdxtOk1BmMJspX08nAhRxZA"
+            "j3urNaBDkKPKmCiDgpaBNwJHlAVPi9LuVun6rFqRASkjz7jDTt+EVgrWHnJxcikXYMx32VYFteQXPQNpYmPqrduJVuadcgCZWqBqVWGVHR"
+            "pRdb2OXYPkJ3FEnvPZtSnufcgrticJBD5PDY6LKYmhNwgvVOXjSPRDxsDnqc5fSn4+zQYAZHo4ZbarRpPoj9C+YXp+BDb8gfm7wyuwKLSt"
+            "UE5cck4dbWae+Vvle5QrObNw==",
         )
 
     def test_signature_v1_unicode(self):
         tested = self.signer.signature_v1("こんにちはÆ")
         self.assertEqual(
             tested,
-            "cHrT3G7zCA2aRcY5jtvNlm0orafBOn924rQ9aSQS1lvNCwbg/LMnTsV+jHZUtOyDFSvErBwd9ga1FrsjOQDfhNoU1K+pVQ11nHU23cHQi0"
-            "bsYByKPIDh1jMW4wNtP+A7Z/Xh0CIESBc+SaeIjPznMunocwci34kN4AXWudkZ2+xZxqfZiX6TVrwmREppsgoZD2ODVt6FtnBvcGd0sRAa"
-            "9A3Iy+EaB8wOM5kaUyusfGcxeCYuCGN1FHjd1AkBkm2I4wbsxQInKDyYQXjMv3fA5oMw4nxhL/AJzUx3xWWCG5pub1/YB3jWwQgtGjpxvb"
-            "5LhHT9S/JtuT8RU01JukC8dQ==",
+            "F7t8/AJCbGFDbIsE41u0CqsT4VB2lm0hXlQdCw2Io/5fBjJOGMZTiHEUj604YSb/zWKgFZYYUNpY+aVXZH7EjkB/Lg1l8MIid1OMV9Ok/U"
+            "bhMzvcPrHoi8DqOzvbx/+be4hN9GpDiY5woBak2E7NgI0x8sagpUXjMqnRR47O3PCLsE0x0PjkSGztWFt2aRWYSlRASi96Z8ESLhF76KbI"
+            "G7iekW54/EusK+qGA3sewlWbCuBisVBoF8yRtukwq065vz7VZx1GPNGbmB+MF6uGvxh+hhcYbq/kbcuHoAtqrp0oJJqXRbvPzrUZKZW86O"
+            "tQzekMkzapDDMfJhE0V+SxNw==",
         )
 
     def test_signature_v2(self):
         tested = self.signer.signature_v2("Hello world")
         self.assertEqual(
             tested,
-            "KODkSEnqjr52EWOFvrRj2igwMR8EHsFYpBzDSEWge7UenB3u8OKP1nXeg1oJ0X1z8S+fpODMOh6NaGalEZgoyk0VRZ/BhFRiOg/xCMm6DA"
-            "2J48EtBt8DYONVKTp4W2e2OU68NMGlj2upkjSsiD8MoIu2SHYwdkjx4PwKl2sPbQtKnsyl6kgSfhGd+1WsgTELDfeNdy3mSX7iJtKkpmUV"
-            "5DZ1P0BcPCLbh/2KfAHx4sDIHFUf+U06ei/WVNzz1l5+fpwE0EV/lxtMLcCFUVQlM9li8Yjpsh0EbwzuV24pMB0xhwvci4B7JSYbLK76JU"
-            "BthhwzUtXzyuzfQi4lNeXR7g==",
+            "G7jZk1nf5kd+oOzHfMsTS18pNkZea22pT6XsJaH5XCKqP4tYoua5isDWtipagwmjveEr3dG2tUC9KwiOLDGO30xiO4fdZwhyUb3mBrtELC"
+            "rBz0nXoH7BlhV4LmRVtiPtVwLHauRb01KglPx0WoyuOEbrCO4ikwls75s/wv22Xk6kVFYx2y1r+HQWpeqQETarQs/x/2W610TqDjNdXU0V"
+            "FRKJ8w0ERWlt5lJGBhp0zaoguyyVMvC8fjNHFORNIZHYVd0DOQAOlHmJD+0JdNo+2qcrA2d3G4+vc/pWRV+lI2buudyOGSnURZhKan/S0j"
+            "Ue9yF2tS+3wXulqfLM3pFhwA==",
         )
 
     def test_signature_v2_unicode(self):
         tested = self.signer.signature_v2("こんにちはÆ")
         self.assertEqual(
             tested,
-            "F9OqgCXr6vKAVBoU8Iogg09HhMZ+FpcJ8Q8DJ/M82vCDjVdxYQ1BYpuyXWN2jIH5CWKnYvXxF49aKwiXuo7bgUArNZZJuwRzI5hSEwsY6w"
-            "eVzlsO8DmdDR62MKozK9NBEr7nnVka8NFEWrprWNPrgvy//YK5NAPSt+tLq/7qk5+qJZRjAjAhl09FD2pzYNGZkLx24UuPPfPSkvQKcybc"
-            "AgY5y17FNkQTYYudjBy2hG6Df+Op77VjKx5yaLHZfoKcOmxc6UdE09kkoS5rsW2Y65kLi4xWbLK3i+VUC+WCqL8Vt7McJFMAwOyACDJPr4"
-            "Z3VtHUZgnT9b5n7c7U/CItRg==",
+            "eHvTMmEH31a9Tz6ZikHNUQPtii5iSjbkukQcFflQR6BtWL+HlZGgyjcL8jOT9oVMxkFV2eITrBA4hBPGznJlQ22yRca82tcOBKznllqTPT"
+            "0vk8t2oX4ruPjFO1vaw/Eiko3r29+VflYibAEmP5m+SqhUZn5BWeDlFAkp6UqVOtfQzX7I6J/M7tsgw8PZQp6FUUDtXPSLFAkIPpcW/wND"
+            "siV5wjlQzdlDAMc+Onc0lMFUcG0uH2W3ciUe5I2+ID4EvuprEUFDy8FYzXativ9p3k5TGtt7u0BXd39ll4r7p6pdby6+JgFjT2ITg3N5iC"
+            "q17UFV5tFUABZ3dak/wT0apA==",
         )
 
     def test_signature_v1_binary_body(self):
@@ -110,10 +110,10 @@ class SignerTest(unittest.TestCase):
         tested = self.signer.signature_v1(string_to_sign_v1)
         self.assertEqual(
             tested,
-            "hDKYDRnzPFL2gzsru4zn7c7E7KpEvexeF4F5IR+puDxYXrMmuT2/fETZty5NkGGTZQ1nI6BTYGQGsU/73TkEAm7SvbJZcB2duLSCn8H5D0"
-            "S1cafory1gnL1TpMPBlY8J/lq/Mht2E17eYw+P87FcpvDShINzy8GxWHqfquBqO8ml4XtirVEtAlI0xlkAsKkVq4nj7rKZUMS85mzogjUA"
-            "Jn3WgpGCNXVU+EK+qElW5QXk3I9uozByZhwBcYt5Cnlg15o99+53wKzMMmdvFmVjA1DeUaSO7LMIuw4ZNLVdDcHJx7ZSpAKZ/EA34u1fYN"
-            "ECFcw5CSKOjdlU7JFr4o8Phw==",
+            "19C27KyNwGA3KByjpQi7MssyDGBAha4ByuPmIobaZ9PRnXa42ZD1njD5ZQVuNMDHtL+Zfo851UGmPphaqgJeSK4niqUOM2dhwMuj6QAE+z"
+            "0IFfhJvIXrIp1FAavMSlrdeDRqsVWjlwfoZeqY3HJk1vfY+7YMYApIPagmZH/3OoSB84k3o6WYplGtT8KvKRi8GDlq6D+gLLtAo9ocgQAO"
+            "OhSzNyCowNcMUKXq8LlVXFguekawC8oEz+zJ0zJhDh9NnXMfp3fIg0a2MBDZhQSRLFUo/AMczZBGMl63nIQWq029/0f3xdiiQf3Trv4wBS"
+            "zCiMSnPMg4uOjfDZY0tMR1JA==",
         )
 
     def test_signature_v2_binary_body(self):
@@ -121,10 +121,10 @@ class SignerTest(unittest.TestCase):
         tested = self.signer.signature_v2(string_to_sign_v2)
         self.assertEqual(
             tested,
-            "kNmQchPnfSZOo29GHHDcp+res452+IIiWK/h7HmPdFsTU510X+eWPLaYONmfd2fMAuVLncDAiOPxyOS4WXap69szL37k9537ujnEU15I+j"
-            "+vINTspCnAIbtZ9ia35c+gQyPgNQo7F1RxNl1P3hfXJ4qNXIrMSc/DlKpieNzmXQFPFs9zZxK5VPvdS0QBsuQFSMN71o2Rupf+NRStxvH5"
-            "5pVej/mjJj4PbeCgAX2N6Vi0dqU2GLgcx+0U5j5FphLUIdqF6/6FKRqPRSCLX5hEyFf2c4stRnNWSpP/y/gGFtdIVxFzKEe42cL3FmYSM4"
-            "YFTKn3wGgViw0W+CzkbDXJqQ==",
+            "s9cqo1kIqiw9lvCxXq2ObAIJOU/m0tap79ox8mvKKS8QabGvIJblwRn5YiUwYb2VHix0q3teU4+CYuLe5+wuxhwtraAfNwZQt0eIfyO3AX"
+            "Q001BVaROq75GW7bEFKoy0TOx4dgaFTHTs56Pr6A3cC4IPGBpV5Utlx6ck0Wd6u6rU7BDtZLawVl6wg3fvXn23iFP1D0QwouldyCtL9y9E"
+            "TjWzTnFSz9cRPrZ4dzKyVeUwsCCGSkcYTz+jYTfvsv51OVOdxaTscyGWyTC2V4QRScONESHZ7Yhs8C6YgTgMdtNGyozqHreLB4ptP2HdII"
+            "a7Nv2jIZUozyjkED+G0OEisA==",
         )
 
     def test_sign_versions(self):
