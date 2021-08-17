@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mauth-client"
-version = "1.2.1"
+version = "1.2.2"
 description = "MAuth Client for Python"
 repository = "https://github.com/mdsol/mauth-client-python"
 authors = ["Medidata Solutions <support@mdsol.com>"]

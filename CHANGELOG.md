@@ -1,3 +1,6 @@
+# 1.2.2
+- Extend the fallback cache TTL to 5 minutes.
+
 # 1.2.1
 - Add autodeploy to PyPI
 - Remove Support for EOL Python 3.5
