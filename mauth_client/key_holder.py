@@ -7,7 +7,7 @@ from mauth_client.lambda_helper import generate_mauth
 from mauth_client.exceptions import InauthenticError
 
 CACHE_MAXSIZE = 128
-CACHE_TTL = 60
+CACHE_TTL = 300
 MAX_AGE_REGEX = re.compile(r"max-age=(\d+)")
 
 

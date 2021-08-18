@@ -46,7 +46,7 @@ class TestKeyHolder(unittest.TestCase):
             requests.get(MAUTH_PATH, text=json.dumps(MAUTH_RESPONSE))
             self.assertEqual(KeyHolder.get_public_key(APP_UUID), PUBLIC_KEY)
             self.assertEqual(KeyHolder._CACHE.maxsize, 128)
-            self.assertEqual(KeyHolder._CACHE.ttl, 60)
+            self.assertEqual(KeyHolder._CACHE.ttl, 300)
 
     def test_get_request_respect_cache_header(self):
         KeyHolder._CACHE = None
