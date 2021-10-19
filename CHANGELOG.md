@@ -1,3 +1,6 @@
+# 1.3.0
+- Support Python 3.10.
+
 # 1.2.2
 - Extend the fallback cache TTL to 5 minutes.
 
