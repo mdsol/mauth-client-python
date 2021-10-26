@@ -23,7 +23,7 @@ index-url = https://<username>:<password>@mdsol.jfrog.io/mdsol/api/pypi/pypi-pac
 
 Install using pip:
 ```
-$ pip install mauth-client
+$ pip install mauth_client
 ```
 
 Or directly from GitHub:
