@@ -3,7 +3,7 @@ language: python
 cache: pip
 
 python:
-  - 3.6
+  - 3.6.2
   - 3.7.13 # specify micro version to avoid having EnvCommandError
   - 3.8
   - 3.9

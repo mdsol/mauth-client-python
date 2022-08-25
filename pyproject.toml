@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.2"
 requests = "^2.23"
 cachetools = "^4.1"
 rsa = "^4.0"
@@ -40,6 +40,7 @@ pytest-randomly = "^3.3"
 pytest-subtests = "^0.3"
 flake8 = "^3.7"
 tox = "^3.22.0"
+fastapi = "^0.80.0"
 
 [tool.black]
 line-length = 120

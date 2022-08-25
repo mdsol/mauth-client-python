@@ -1,0 +1,1 @@
+from .fastapi_authenticator import authenticate, requires_authentication
