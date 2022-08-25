@@ -1,1 +1,1 @@
-from .fastapi_authenticator import authenticate, requires_authentication
+from .fastapi_authenticator import FastAPIAuthenticator, requires_authentication
