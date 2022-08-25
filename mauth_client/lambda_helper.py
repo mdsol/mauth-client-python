@@ -12,9 +12,12 @@ def generate_mauth():
 def _get_private_key():
     private_key = Config.PRIVATE_KEY
     if RSA_PRIVATE_KEY not in private_key:
-        import boto3
+        try:
+            import boto3
 
-        kms_client = boto3.client("kms")
-        private_key = kms_client.decrypt(CiphertextBlob=b64decode(private_key))["Plaintext"].decode("ascii")
+            kms_client = boto3.client("kms")
+            private_key = kms_client.decrypt(CiphertextBlob=b64decode(private_key))["Plaintext"].decode("ascii")
+        except ModuleNotFoundError:
+            pass
 
     return private_key.replace(" ", "\n").replace("\nRSA\nPRIVATE\nKEY", " RSA PRIVATE KEY")

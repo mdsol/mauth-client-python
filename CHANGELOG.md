@@ -1,3 +1,6 @@
+# 1.2.3
+- Ignore `boto3` import error (`ModuleNotFoundError`).
+
 # 1.2.2
 - Extend the fallback cache TTL to 5 minutes.
 
