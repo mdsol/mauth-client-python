@@ -1,5 +1,6 @@
 # 1.3.0
 - Add `FastAPIAuthenticator` to authenticate requests in FastAPI applications.
+- Remove Support for EOL Python 3.6
 
 # 1.2.3
 - Ignore `boto3` import error (`ModuleNotFoundError`).
