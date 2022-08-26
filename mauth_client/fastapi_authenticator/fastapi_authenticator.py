@@ -33,7 +33,7 @@ class FastAPIAuthenticator:
         """
         self._app = app
         self._authenticator = self
-        setattr(app.state, self.state_key, self)
+        setattr(app.state, state_key, self)
 
         self._authenticator = self._get_authenticator()
 
@@ -67,7 +67,7 @@ class FastAPIAuthenticator:
 
 async def requires_authentication(request: Request) -> None:
     """
-    FastAPI Dependecy function for routes requiring MAuth authentication
+    FastAPI Dependency function for routes requiring MAuth authentication
     """
     authenticator = getattr(request.app.state, state_key)
     is_authentic, status, msg = await authenticator.authenticate(request)
