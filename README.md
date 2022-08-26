@@ -114,22 +114,16 @@ app_uuid = authenticator.get_app_uuid()
 
 #### Flask applications
 
-You will need to create an application instance and initialize it with FlaskAuthenticator:
+You will need to create an application instance and initialize it with FlaskAuthenticator.
+To specify routes that need to be authenticated use the `requires_authentication` decorator.
 
 ```python
 from flask import Flask
-from mauth_client.flask_authenticator import FlaskAuthenticator
+from mauth_client.flask_authenticator import FlaskAuthenticator, requires_authentication
 
 app = Flask("Some Sample App")
 authenticator = FlaskAuthenticator()
 authenticator.init_app(app)
-```
-
-To specify routes that need to be authenticated use the `requires_authentication` decorator:
-
-```python
-from flask import Flask
-from mauth_client.flask_authenticator import requires_authentication
 
 @app.route("/some/private/route", methods=["GET"])
 @requires_authentication
@@ -141,6 +135,27 @@ def app_status():
     return "OK"
 ```
 
+#### FastAPI applications
+
+You will need to create an application instance and initialize it with FastAPIAuthenticator.
+To specify routes that need to be authenticated use the `requires_authentication` dependency.
+
+```python
+from fastapi import FastAPI, Depends
+from mauth_client.fastapi_authenticator import FastAPIAuthenticator
+
+app = FastAPI()
+authenticator = FastAPIAuthenticator()
+authenticator.init_app(app)
+
+@app.get("/some/private/route", dependencies=[Depends(requires_authentication)])
+def private_route():
+    return {"msg": "top secret"}
+
+@app.get("/app_status")
+def app_status():
+    return {"msg": "OK"}
+```
 
 ## Contributing
 
