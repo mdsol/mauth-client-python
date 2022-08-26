@@ -1,3 +1,6 @@
+# 1.3.0
+- Add `FastAPIAuthenticator` to authenticate requests in FastAPI applications.
+
 # 1.2.3
 - Ignore `boto3` import error (`ModuleNotFoundError`).
 

@@ -16,7 +16,6 @@ To setup your environment:
   ```
 1. Install Pyenv versions for the Tox Suite
   ```bash
-  pyenv install 3.5.8
   pyenv install 3.6.10
   pyenv install 3.7.7
   pyenv install 3.8.2
@@ -24,15 +23,11 @@ To setup your environment:
   ```
 1. Install Poetry
   ```bash
-  curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+  pip install poetry
   ```
-1. Install Tox
+1. Install Dependencies
   ```bash
-  pip install tox
-  ```
-1. Setup the local project versions (one for each env in the `envlist`)
-  ```bash
-  pyenv local 3.5.8 3.6.10 3.7.7 3.8.2 pypy3.6-7.1.1
+  poetry install -v
   ```
 
 
@@ -54,5 +49,5 @@ to init the submodule.
 
 ## Unit Tests
 
-1. Make any changes, update the tests and then run tests with `tox`
+1. Make any changes, update the tests and then run tests with `poetry run tox`
 1. Coverage report can be viewed using `open htmlcov/index.html`
