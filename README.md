@@ -142,7 +142,7 @@ To specify routes that need to be authenticated use the `requires_authentication
 
 ```python
 from fastapi import FastAPI, Depends
-from mauth_client.fastapi_authenticator import FastAPIAuthenticator
+from mauth_client.fastapi_authenticator import FastAPIAuthenticator, requires_authentication
 
 app = FastAPI()
 authenticator = FastAPIAuthenticator()
