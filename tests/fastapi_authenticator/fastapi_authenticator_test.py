@@ -66,7 +66,7 @@ class TestFastAPIAuthenticator(unittest.TestCase):
         authenticator.init_app(self.app)
 
         @self.app.get("/", dependencies=[Depends(requires_authentication)])
-        def root():
+        async def root():
             return {"msg": "helloes"}
 
         client = TestClient(self.app)
@@ -86,7 +86,7 @@ class TestFastAPIAuthenticator(unittest.TestCase):
         authenticator.init_app(self.app)
 
         @self.app.get("/")
-        def root():
+        async def root():
             return {"msg": "helloes"}
 
         client = TestClient(self.app)
@@ -103,7 +103,7 @@ class TestFastAPIAuthenticator(unittest.TestCase):
         authenticator.authenticate = MagicMock(return_value=f)
 
         @self.app.get("/", dependencies=[Depends(requires_authentication)])
-        def root():
+        async def root():
             return {"msg": "helloes"}
 
         client = TestClient(self.app)

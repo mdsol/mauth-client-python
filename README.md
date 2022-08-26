@@ -149,11 +149,11 @@ authenticator = FastAPIAuthenticator()
 authenticator.init_app(app)
 
 @app.get("/some/private/route", dependencies=[Depends(requires_authentication)])
-def private_route():
+async def private_route():
     return {"msg": "top secret"}
 
 @app.get("/app_status")
-def app_status():
+async def app_status():
     return {"msg": "OK"}
 ```
 
