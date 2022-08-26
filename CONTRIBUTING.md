@@ -14,12 +14,9 @@ To setup your environment:
   brew update
   brew install pyenv
   ```
-1. Install Pyenv versions for the Tox Suite
+1. Install your favorite Python version (>= 3.8 please!)
   ```bash
-  pyenv install 3.6.10
-  pyenv install 3.7.7
-  pyenv install 3.8.2
-  pyenv install pypy3.6-7.3.1
+  pyenv install <YOUR_FAVORITE_VERSION>
   ```
 1. Install Poetry
   ```bash
@@ -49,5 +46,6 @@ to init the submodule.
 
 ## Unit Tests
 
-1. Make any changes, update the tests and then run tests with `poetry run tox`
-1. Coverage report can be viewed using `open htmlcov/index.html`
+1. Make any changes, update the tests and then run tests with `poetry run tox`.
+1. Coverage report can be viewed using `open htmlcov/index.html`.
+1. Or if you don't care about tox, just run `poetry run pytest` or `poetry run pytest <SOME_FILE>`.
