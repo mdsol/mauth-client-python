@@ -114,7 +114,7 @@ app_uuid = authenticator.get_app_uuid()
 
 #### Flask applications
 
-You will need to create an application instance and initialize it with FlaskAuthenticator.
+You will need to create an application instance and initialize it with `FlaskAuthenticator`.
 To specify routes that need to be authenticated use the `requires_authentication` decorator.
 
 ```python
@@ -137,7 +137,7 @@ def app_status():
 
 #### FastAPI applications
 
-You will need to create an application instance and initialize it with FastAPIAuthenticator.
+You will need to create an application instance and initialize it with `FastAPIAuthenticator`.
 To specify routes that need to be authenticated use the `requires_authentication` dependency.
 
 ```python
