@@ -12,6 +12,7 @@ from mauth_client.authenticator import LocalAuthenticator
 from mauth_client.config import Config
 from mauth_client.signable import RequestSignable
 from mauth_client.signed import Signed
+from mauth_client.utils import decode
 
 from copy import deepcopy
 
@@ -20,14 +21,14 @@ logger = logging.getLogger("mauth_asgi")
 
 class MAuthASGIMiddleware:
     def __init__(self, app: ASGI3Application) -> None:
-        # self._validate_configs()
+        self._validate_configs()
         self.app = app
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        url = "?".join(scope["path"], scope["query_string"].decode("utf-8"))
-        headers = self._get_headers(scope)
+        url = "?".join([scope["path"], decode(scope["query_string"])])
+        headers = {decode(k): decode(v) for k, v in scope["headers"]}
         body = await self._get_body(receive)
 
         signable = RequestSignable(
@@ -51,29 +52,22 @@ class MAuthASGIMiddleware:
         else:
             await self._send_response(send, status, message)
 
-
     def _validate_configs(self) -> None:
         # Validate the client settings (APP_UUID, PRIVATE_KEY)
         if not all([Config.APP_UUID, Config.PRIVATE_KEY]):
-            raise TypeError("FastAPIAuthenticator requires APP_UUID and PRIVATE_KEY")
+            raise TypeError("MAuthASGIMiddleware requires APP_UUID and PRIVATE_KEY")
         # Validate the mauth settings (MAUTH_BASE_URL, MAUTH_API_VERSION)
         if not all([Config.MAUTH_URL, Config.MAUTH_API_VERSION]):
-            raise TypeError("FastAPIAuthenticator requires MAUTH_URL and MAUTH_API_VERSION")
+            raise TypeError("MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION")
 
-    def _get_headers(scope: Scope) -> dict:
-        return {
-            k.decode("utf-8"): v.decode("utf-8")
-            for k, v in scope["headers"]
-        }
-
-    async def _get_body(receive: ASGIReceiveCallable) -> str:
+    async def _get_body(self, receive: ASGIReceiveCallable) -> str:
         body = b""
         more_body = True
         while more_body:
             msg = await receive()
             body += msg.get("body", b"")
             more_body = msg.get("more_body", False)
-        return body.decode("utf-8")
+        return decode(body)
 
     async def _send_response(self, send: ASGISendCallable, status: int, msg: str) -> None:
         await send({
@@ -82,7 +76,7 @@ class MAuthASGIMiddleware:
             "headers": [(b"content-type", b"application/json")],
         })
         body = {"errors": {"mauth": msg}}
-        await({
+        await send({
             "type": "http.response.body",
             "body": json.dumps(body).encode("utf-8")
         })

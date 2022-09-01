@@ -1,4 +1,5 @@
 import base64
+import cchardet
 from hashlib import sha512
 
 
@@ -20,3 +21,14 @@ def hexdigest(val):
 
 def base64_encode(signature):
     return base64.b64encode(signature).decode("US-ASCII").replace("\n", "")
+
+
+def decode(byte_string: bytes) -> str:
+    """
+    Attempt to decode a byte string with utf and fallback to chardet.
+    """
+    try:
+        return byte_string.decode("utf-8")
+    except UnicodeDecodeError:
+        encoding = cchardet.detect(byte_string)["encoding"]
+        return byte_string.decode(encoding)
