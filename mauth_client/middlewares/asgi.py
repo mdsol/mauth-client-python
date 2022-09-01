@@ -27,7 +27,7 @@ class MAuthASGIMiddleware:
     ) -> None:
         url = "?".join(scope["path"], scope["query_string"].decode("utf-8"))
         headers = self._get_headers(scope)
-        body = self._get_body(receive)
+        body = await self._get_body(receive)
 
         signable = RequestSignable(
             method=scope["method"],
