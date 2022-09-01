@@ -18,10 +18,7 @@ To setup your environment:
   ```bash
   pyenv install <YOUR_FAVORITE_VERSION>
   ```
-1. Install Poetry
-  ```bash
-  pip install poetry
-  ```
+1. Install Poetry, see: https://python-poetry.org/docs/#installation
 1. Install Dependencies
   ```bash
   poetry install -v
