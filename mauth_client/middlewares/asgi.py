@@ -1,3 +1,4 @@
+import json
 import logging
 
 from asgiref.typing import (
@@ -42,13 +43,14 @@ class MAuthASGIMiddleware:
 
         is_authentic, status, message = authenticator.is_authentic()
 
-        if not is_authentic:
-            raise Exception("Inauthentic")
+        if is_authentic:
+            # asgi spec calls for passing a copy of the scope rather than mutating it
+            scope_copy = deepcopy(scope)
+            scope_copy["mauth"] = {"app_uuid": authenticator.signed.app_uuid}
+            await self.app(scope_copy, receive, send)
+        else:
+            await self._send_response(send, status, message)
 
-        # asgi spec calls for passing a copy of the scope rather than mutating it
-        scope_copy = deepcopy(scope)
-        scope_copy["mauth"] = {"app_uuid": authenticator.signed.app_uuid}
-        await self.app(scope_copy, receive, send)
 
     def _validate_configs(self) -> None:
         # Validate the client settings (APP_UUID, PRIVATE_KEY)
@@ -72,3 +74,15 @@ class MAuthASGIMiddleware:
             body += msg.get("body", b"")
             more_body = msg.get("more_body", False)
         return body.decode("utf-8")
+
+    async def _send_response(self, send: ASGISendCallable, status: int, msg: str) -> None:
+        await send({
+            "type": "http.response.start",
+            "status": status,
+            "headers": [(b"content-type", b"application/json")],
+        })
+        body = {"errors": {"mauth": msg}}
+        await({
+            "type": "http.response.body",
+            "body": json.dumps(body).encode("utf-8")
+        })
