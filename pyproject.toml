@@ -27,6 +27,7 @@ requests = "^2.23"
 cachetools = "^4.1"
 rsa = "^4.0"
 importlib-metadata = {version = "^3.6", python = "<3.8"}
+asgiref = "^3.5.2"
 
 [tool.poetry.dev-dependencies]
 boto3 = "^1.24"
