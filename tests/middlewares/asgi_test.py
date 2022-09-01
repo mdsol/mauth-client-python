@@ -8,7 +8,7 @@ from mauth_client.config import Config
 from mauth_client.middlewares import MAuthASGIMiddleware
 
 
-class TestMAuthASGIMiddleware(unittest.TestCase):
+class TestMAuthASGIMiddlewareConfigs(unittest.TestCase):
     def setUp(self):
         self.app = FastAPI()
         Config.APP_UUID = str(uuid4())
@@ -58,15 +58,32 @@ class TestMAuthASGIMiddleware(unittest.TestCase):
             "MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION"
         )
 
-    def test_401_reponse_when_not_authenticated(self):
-        self.app.add_middleware(MAuthASGIMiddleware)
+
+class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
+    def setUp(self):
+        Config.APP_UUID = str(uuid4())
+        Config.MAUTH_URL = "https://mauth.com"
+        Config.MAUTH_API_VERSION = "v1"
+        Config.PRIVATE_KEY = "key"
+
+        self.app = FastAPI()
+        self.protected_app = FastAPI()
 
         @self.app.get("/")
         def root():
             return {"msg": "helloes"}
 
+        self.protected_app.add_middleware(MAuthASGIMiddleware)
+
+        @self.protected_app.get("/")
+        def protected():
+            return {"msg": "protected"}
+
+        self.app.mount("/protected", self.protected_app)
+
+    def test_401_reponse_when_not_authenticated(self):
         client = TestClient(self.app)
-        response = client.get("/")
+        response = client.get("/protected")
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {
