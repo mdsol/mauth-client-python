@@ -98,11 +98,11 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {
             "errors": {
-                "mauth": (
+                "mauth": [(
                     "Authentication Failed. No mAuth signature present; "
                     "X-MWS-Authentication header is blank, "
                     "MCC-Authentication header is blank."
-                )
+                )]
             }
         })
 

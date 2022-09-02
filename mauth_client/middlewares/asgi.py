@@ -84,7 +84,7 @@ class MAuthASGIMiddleware:
             "status": status,
             "headers": [(b"content-type", b"application/json")],
         })
-        body = {"errors": {"mauth": msg}}
+        body = {"errors": {"mauth": [msg]}}
         await send({
             "type": "http.response.body",
             "body": json.dumps(body).encode("utf-8"),
