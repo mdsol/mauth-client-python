@@ -154,3 +154,16 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
             return {"msg": "got it"}
 
         self.client.get("/v2_test", headers=headers_v2)
+
+    @patch.object(LocalAuthenticator, "is_authentic")
+    def test_downstream_can_receive_body(self, is_authentic_mock):
+        is_authentic_mock.return_value = (True, 200, "")
+        expected_body = {"msg": "test"}
+
+        @self.app.post("/post_test")
+        async def post_test(request: Request):
+            body = await request.json()
+            self.assertEqual(body, expected_body)
+            return {"msg": "app can still read the body!"}
+
+        self.client.post("/post_test", json=expected_body)

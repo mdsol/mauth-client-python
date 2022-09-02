@@ -4,9 +4,11 @@ import logging
 from asgiref.typing import (
     ASGI3Application,
     ASGIReceiveCallable,
+    ASGIReceiveEvent,
     ASGISendCallable,
     Scope,
 )
+from typing import List, Tuple
 
 from mauth_client.authenticator import LocalAuthenticator
 from mauth_client.config import Config
@@ -39,7 +41,8 @@ class MAuthASGIMiddleware:
         query_string = scope["query_string"]
         url = f"{path}?{decode(query_string)}" if query_string else path
         headers = {decode(k): decode(v) for k, v in scope["headers"]}
-        body = await self._get_body(receive)
+
+        events, body = await self._get_body(receive)
 
         signable = RequestSignable(
             method=scope["method"],
@@ -57,7 +60,7 @@ class MAuthASGIMiddleware:
             scope_copy[ENV_APP_UUID] = signed.app_uuid
             scope_copy[ENV_AUTHENTIC] = True
             scope_copy[ENV_PROTOCOL_VERSION] = signed.protocol_version()
-            await self.app(scope_copy, receive, send)
+            await self.app(scope_copy, self._fake_receive(events), send)
         else:
             await self._send_response(send, status, message)
 
@@ -69,14 +72,19 @@ class MAuthASGIMiddleware:
         if not all([Config.MAUTH_URL, Config.MAUTH_API_VERSION]):
             raise TypeError("MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION")
 
-    async def _get_body(self, receive: ASGIReceiveCallable) -> str:
+    async def _get_body(
+        self, receive: ASGIReceiveCallable
+    ) -> Tuple[List[ASGIReceiveEvent], str]:
         body = b""
         more_body = True
+        events = []
+
         while more_body:
-            msg = await receive()
-            body += msg.get("body", b"")
-            more_body = msg.get("more_body", False)
-        return decode(body)
+            event = await receive()
+            body += event.get("body", b"")
+            more_body = event.get("more_body", False)
+            events.append(event)
+        return (events, decode(body))
 
     async def _send_response(self, send: ASGISendCallable, status: int, msg: str) -> None:
         await send({
@@ -89,3 +97,19 @@ class MAuthASGIMiddleware:
             "type": "http.response.body",
             "body": json.dumps(body).encode("utf-8"),
         })
+
+    def _fake_receive(self, events: List[ASGIReceiveEvent]) -> ASGIReceiveCallable:
+        """
+        Create a fake, async receive function using an iterator of the events
+        we've already read. This will be passed to downstream middlewares/apps
+        instead of the usual receive fn, so that they can also "receive" the
+        body events.
+        """
+        events_iter = iter(events)
+
+        async def _receive() -> ASGIReceiveEvent:
+            try:
+                return next(events_iter)
+            except StopIteration:
+                pass
+        return _receive
