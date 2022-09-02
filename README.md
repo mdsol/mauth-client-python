@@ -137,9 +137,13 @@ def app_status():
 
 #### ASGI applications
 
-To apply to an ASGI application you should use the `MAuthASGIMiddleware`. Here is an example
-for FastAPI. Note that requesting app's UUID and the protocol version will be
-added to the ASGI `scope` for successfully authenticated requests.
+To apply to an ASGI application you should use the `MAuthASGIMiddleware`. You
+can make certain paths exempt from authentication by passing the `exempt`
+option with a set of paths to exempt.
+
+Here is an example for FastAPI. Note that requesting app's UUID and the
+protocol version will be added to the ASGI `scope` for successfully
+authenticated requests.
 
 ```python
 from fastapi import FastAPI, Request
@@ -147,7 +151,7 @@ from mauth_client.constants import ENV_APP_UUID, ENV_PROTOCOL_VERSION
 from mauth_client.middlewares import MAuthASGIMiddleware
 
 app = FastAPI()
-app.add_middleware(MAuthASGIMiddleware)
+app.add_middleware(MAuthASGIMiddleware, exempt={"/app_status"})
 
 @app.get("/")
 async def root(request: Request):
@@ -155,6 +159,12 @@ async def root(request: Request):
         "msg": "authenticated",
         "app_uuid": request.scope[ENV_APP_UUID],
         "protocol_version": request.scope[ENV_PROTOCOL_VERSION],
+    }
+
+@app.get("/app_status")
+async def app_status():
+    return {
+        "msg": "this route is exempt from authentication",
     }
 ```
 

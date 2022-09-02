@@ -23,19 +23,21 @@ logger = logging.getLogger("mauth_asgi")
 
 
 class MAuthASGIMiddleware:
-    def __init__(self, app: ASGI3Application) -> None:
+    def __init__(self, app: ASGI3Application, exempt: set = set()) -> None:
         self._validate_configs()
         self.app = app
+        self.exempt = exempt
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        url = scope["path"]
+        path = scope["path"]
+
+        if path in self.exempt:
+            return await self.app(scope, receive, send)
+
         query_string = scope["query_string"]
-
-        if query_string:
-            url += f"?{decode(query_string)}"
-
+        url = f"{path}?{query_string}" if query_string else path
         headers = {decode(k): decode(v) for k, v in scope["headers"]}
         body = await self._get_body(receive)
 

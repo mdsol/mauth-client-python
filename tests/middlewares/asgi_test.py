@@ -80,23 +80,20 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
         Config.PRIVATE_KEY = "key"
 
         self.app = FastAPI()
-        self.protected_app = FastAPI()
+        self.app.add_middleware(MAuthASGIMiddleware, exempt={"/app_status"})
 
         @self.app.get("/")
-        def root():
-            return {"msg": "helloes"}
+        async def root():
+            return {"msg": "authenticated"}
 
-        self.protected_app.add_middleware(MAuthASGIMiddleware)
+        @self.app.get("/app_status")
+        async def app_status():
+            return {"msg": "open"}
 
-        @self.protected_app.get("/")
-        def protected():
-            return {"msg": "protected"}
-
-        self.app.mount("/protected", self.protected_app)
         self.client = TestClient(self.app)
 
     def test_401_reponse_when_not_authenticated(self):
-        response = self.client.get("/protected")
+        response = self.client.get("/")
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {
@@ -109,61 +106,51 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
             }
         })
 
-    def test_ok_when_calling_unprotected_route(self):
-        response = self.client.get("/")
+    def test_ok_when_calling_open_route(self):
+        response = self.client.get("/app_status")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"msg": "helloes"})
+        self.assertEqual(response.json(), {"msg": "open"})
 
     @patch.object(LocalAuthenticator, "is_authentic")
     def test_ok_when_authenticated(self, is_authentic_mock):
         is_authentic_mock.return_value = (True, 200, "")
 
-        response = self.client.get("/protected")
+        response = self.client.get("/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"msg": "protected"})
+        self.assertEqual(response.json(), {"msg": "authenticated"})
 
     @patch.object(LocalAuthenticator, "is_authentic")
     def test_adds_values_to_context_v1(self, is_authentic_mock):
         is_authentic_mock.return_value = (True, 200, "")
 
-        app = FastAPI()
-        app.add_middleware(MAuthASGIMiddleware)
-
-        app_uuid = str(uuid4())
         headers_v1 = {
-            X_MWS_AUTH: f"{MWS_TOKEN} {app_uuid}:blah"
+            X_MWS_AUTH: f"{MWS_TOKEN} {self.app_uuid}:blah"
         }
 
-        @app.get("/")
+        @self.app.get("/v1_test")
         def root(request: Request):
-            self.assertEqual(request.scope[ENV_APP_UUID], app_uuid)
+            self.assertEqual(request.scope[ENV_APP_UUID], self.app_uuid)
             self.assertEqual(request.scope[ENV_AUTHENTIC], True)
             self.assertEqual(request.scope[ENV_PROTOCOL_VERSION], 1)
             return {"msg": "got it"}
 
-        client = TestClient(app)
-        client.get("/", headers=headers_v1)
+        self.client.get("/v1_test", headers=headers_v1)
 
     @patch.object(LocalAuthenticator, "is_authentic")
     def test_adds_values_to_context_v2(self, is_authentic_mock):
         is_authentic_mock.return_value = (True, 200, "")
 
-        app = FastAPI()
-        app.add_middleware(MAuthASGIMiddleware)
-
-        app_uuid = str(uuid4())
         headers_v2 = {
-            MCC_AUTH: f"{MWSV2_TOKEN} {app_uuid}:blah{AUTH_HEADER_DELIMITER}"
+            MCC_AUTH: f"{MWSV2_TOKEN} {self.app_uuid}:blah{AUTH_HEADER_DELIMITER}"
         }
 
-        @app.get("/")
+        @self.app.get("/v2_test")
         def root(request: Request):
-            self.assertEqual(request.scope[ENV_APP_UUID], app_uuid)
+            self.assertEqual(request.scope[ENV_APP_UUID], self.app_uuid)
             self.assertEqual(request.scope[ENV_AUTHENTIC], True)
             self.assertEqual(request.scope[ENV_PROTOCOL_VERSION], 2)
             return {"msg": "got it"}
 
-        client = TestClient(app)
-        client.get("/", headers=headers_v2)
+        self.client.get("/v2_test", headers=headers_v2)
