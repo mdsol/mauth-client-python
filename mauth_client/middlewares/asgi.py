@@ -14,8 +14,6 @@ from mauth_client.signable import RequestSignable
 from mauth_client.signed import Signed
 from mauth_client.utils import decode
 
-from copy import deepcopy
-
 logger = logging.getLogger("mauth_asgi")
 
 
@@ -27,7 +25,12 @@ class MAuthASGIMiddleware:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        url = "?".join([scope["path"], decode(scope["query_string"])])
+        url = scope["path"]
+        query_string = scope["query_string"]
+
+        if query_string:
+            url += f"?{decode(query_string)}"
+
         headers = {decode(k): decode(v) for k, v in scope["headers"]}
         body = await self._get_body(receive)
 
@@ -46,7 +49,8 @@ class MAuthASGIMiddleware:
 
         if is_authentic:
             # asgi spec calls for passing a copy of the scope rather than mutating it
-            scope_copy = deepcopy(scope)
+            # note: deepcopy will blow up with infi recursion due to objects in some values
+            scope_copy = scope.copy()
             scope_copy["mauth"] = {"app_uuid": authenticator.signed.app_uuid}
             await self.app(scope_copy, receive, send)
         else:
