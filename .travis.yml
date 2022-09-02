@@ -1,4 +1,4 @@
-dist: jammy
+dist: focal
 language: python
 cache: pip
 
@@ -9,7 +9,7 @@ python:
   - 3.10
 
 before_install:
-  - pip install poetry
+  - pip install poetry==1.1.14
   - pip install tox-travis
 
 install: poetry install -v
