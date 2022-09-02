@@ -10,6 +10,11 @@ from asgiref.typing import (
 
 from mauth_client.authenticator import LocalAuthenticator
 from mauth_client.config import Config
+from mauth_client.consts import (
+    ENV_APP_UUID,
+    ENV_AUTHENTIC,
+    ENV_PROTOCOL_VERSION,
+)
 from mauth_client.signable import RequestSignable
 from mauth_client.signed import Signed
 from mauth_client.utils import decode
@@ -39,19 +44,17 @@ class MAuthASGIMiddleware:
             url=url,
             body=body,
         )
-        authenticator = LocalAuthenticator(
-            signable,
-            Signed.from_headers(headers),
-            logger,
-        )
-
+        signed = Signed.from_headers(headers)
+        authenticator = LocalAuthenticator(signable, signed, logger)
         is_authentic, status, message = authenticator.is_authentic()
 
         if is_authentic:
             # asgi spec calls for passing a copy of the scope rather than mutating it
             # note: deepcopy will blow up with infi recursion due to objects in some values
             scope_copy = scope.copy()
-            scope_copy["mauth"] = {"app_uuid": authenticator.signed.app_uuid}
+            scope_copy[ENV_APP_UUID] = signed.app_uuid
+            scope_copy[ENV_AUTHENTIC] = True
+            scope_copy[ENV_PROTOCOL_VERSION] = signed.protocol_version()
             await self.app(scope_copy, receive, send)
         else:
             await self._send_response(send, status, message)

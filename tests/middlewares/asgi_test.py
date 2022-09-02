@@ -8,7 +8,14 @@ from uuid import uuid4
 from mauth_client.authenticator import LocalAuthenticator
 from mauth_client.config import Config
 from mauth_client.consts import (
-    AUTH_HEADER_DELIMITER, X_MWS_AUTH, MWS_TOKEN, MCC_AUTH, MWSV2_TOKEN
+    AUTH_HEADER_DELIMITER,
+    X_MWS_AUTH,
+    MWS_TOKEN,
+    MCC_AUTH,
+    MWSV2_TOKEN,
+    ENV_APP_UUID,
+    ENV_AUTHENTIC,
+    ENV_PROTOCOL_VERSION,
 )
 from mauth_client.middlewares import MAuthASGIMiddleware
 
@@ -118,7 +125,7 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
         self.assertEqual(response.json(), {"msg": "protected"})
 
     @patch.object(LocalAuthenticator, "is_authentic")
-    def test_adds_app_uuid_to_context_v1(self, is_authentic_mock):
+    def test_adds_values_to_context_v1(self, is_authentic_mock):
         is_authentic_mock.return_value = (True, 200, "")
 
         app = FastAPI()
@@ -131,14 +138,16 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
 
         @app.get("/")
         def root(request: Request):
-            self.assertEqual(request.scope["mauth"]["app_uuid"], app_uuid)
+            self.assertEqual(request.scope[ENV_APP_UUID], app_uuid)
+            self.assertEqual(request.scope[ENV_AUTHENTIC], True)
+            self.assertEqual(request.scope[ENV_PROTOCOL_VERSION], 1)
             return {"msg": "got it"}
 
         client = TestClient(app)
         client.get("/", headers=headers_v1)
 
     @patch.object(LocalAuthenticator, "is_authentic")
-    def test_adds_app_uuid_to_context_v2(self, is_authentic_mock):
+    def test_adds_values_to_context_v2(self, is_authentic_mock):
         is_authentic_mock.return_value = (True, 200, "")
 
         app = FastAPI()
@@ -151,7 +160,9 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
 
         @app.get("/")
         def root(request: Request):
-            self.assertEqual(request.scope["mauth"]["app_uuid"], app_uuid)
+            self.assertEqual(request.scope[ENV_APP_UUID], app_uuid)
+            self.assertEqual(request.scope[ENV_AUTHENTIC], True)
+            self.assertEqual(request.scope[ENV_PROTOCOL_VERSION], 2)
             return {"msg": "got it"}
 
         client = TestClient(app)
