@@ -36,8 +36,8 @@ class MAuthASGIMiddleware:
         if path in self.exempt:
             return await self.app(scope, receive, send)
 
-        query_string = decode(scope["query_string"])
-        url = f"{path}?{query_string}" if query_string else path
+        query_string = scope["query_string"]
+        url = f"{path}?{decode(query_string)}" if query_string else path
         headers = {decode(k): decode(v) for k, v in scope["headers"]}
         body = await self._get_body(receive)
 
