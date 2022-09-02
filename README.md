@@ -138,18 +138,24 @@ def app_status():
 #### ASGI applications
 
 To apply to an ASGI application you should use the `MAuthASGIMiddleware`. Here is an example
-for FastAPI.
+for FastAPI. Note that requesting app's UUID and the protocol version will be
+added to the ASGI `scope` for successfully authenticated requests.
 
 ```python
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from mauth_client.constants import ENV_APP_UUID, ENV_PROTOCOL_VERSION
 from mauth_client.middlewares import MAuthASGIMiddleware
 
 app = FastAPI()
 app.add_middleware(MAuthASGIMiddleware)
 
 @app.get("/")
-async def root():
-    return {"msg": "authenticated"}
+async def root(request: Request):
+    return {
+        "msg": "authenticated",
+        "app_uuid": request.scope[ENV_APP_UUID],
+        "protocol_version": request.scope[ENV_PROTOCOL_VERSION],
+    }
 ```
 
 ## Contributing
