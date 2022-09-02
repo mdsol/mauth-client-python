@@ -135,26 +135,21 @@ def app_status():
     return "OK"
 ```
 
-#### FastAPI applications
+#### ASGI applications
 
-You will need to create an application instance and initialize it with `FastAPIAuthenticator`.
-To specify routes that need to be authenticated use the `requires_authentication` dependency.
+To apply to an ASGI application you should use the `MAuthASGIMiddleware`. Here is an example
+for FastAPI.
 
 ```python
-from fastapi import FastAPI, Depends
-from mauth_client.fastapi_authenticator import FastAPIAuthenticator, requires_authentication
+from fastapi import FastAPI
+from mauth_client.middlewares import MAuthASGIMiddleware
 
 app = FastAPI()
-authenticator = FastAPIAuthenticator()
-authenticator.init_app(app)
+app.add_middleware(MAuthASGIMiddleware)
 
-@app.get("/some/private/route", dependencies=[Depends(requires_authentication)])
-async def private_route():
-    return {"msg": "top secret"}
-
-@app.get("/app_status")
-async def app_status():
-    return {"msg": "OK"}
+@app.get("/")
+async def root():
+    return {"msg": "authenticated"}
 ```
 
 ## Contributing
