@@ -74,7 +74,7 @@ class MAuthASGIMiddleware:
 
     async def _get_body(
         self, receive: ASGIReceiveCallable
-    ) -> Tuple[List[ASGIReceiveEvent], str]:
+    ) -> Tuple[List[ASGIReceiveEvent], bytes]:
         body = b""
         more_body = True
         events = []
@@ -84,7 +84,7 @@ class MAuthASGIMiddleware:
             body += event.get("body", b"")
             more_body = event.get("more_body", False)
             events.append(event)
-        return (events, decode(body))
+        return (events, body)
 
     async def _send_response(self, send: ASGISendCallable, status: int, msg: str) -> None:
         await send({
