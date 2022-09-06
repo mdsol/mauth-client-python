@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
+from fastapi.websockets import WebSocket
 from uuid import uuid4
 
 from mauth_client.authenticator import LocalAuthenticator
@@ -167,3 +168,14 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
             return {"msg": "app can still read the body!"}
 
         self.client.post("/post_test", json=expected_body)
+
+    def test_ignores_non_http_requests(self):
+        @self.app.websocket_route("/ws")
+        async def ws(websocket: WebSocket):
+            await websocket.accept()
+            await websocket.send_json({"msg": "helloes"})
+            await websocket.close()
+
+        with self.client.websocket_connect("/ws") as websocket:
+            data = websocket.receive_json()
+            self.assertEqual(data, {"msg": "helloes"})

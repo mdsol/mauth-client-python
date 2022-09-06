@@ -35,7 +35,7 @@ class MAuthASGIMiddleware:
     ) -> None:
         path = scope["path"]
 
-        if path in self.exempt:
+        if scope["type"] != "http" or path in self.exempt:
             return await self.app(scope, receive, send)
 
         query_string = scope["query_string"]
