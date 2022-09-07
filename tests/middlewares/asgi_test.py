@@ -21,7 +21,7 @@ from mauth_client.consts import (
 from mauth_client.middlewares import MAuthASGIMiddleware
 
 
-class TestMAuthASGIMiddlewareConfigs(unittest.TestCase):
+class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
     def setUp(self):
         self.app = FastAPI()
         Config.APP_UUID = str(uuid4())
@@ -69,6 +69,14 @@ class TestMAuthASGIMiddlewareConfigs(unittest.TestCase):
         self.assertEqual(
             str(exc.exception),
             "MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION"
+        )
+
+    def test_exempt_arg_not_a_set(self):
+        with self.assertRaises(TypeError) as exc:
+            self.app.add_middleware(MAuthASGIMiddleware, exempt=None)
+        self.assertEqual(
+            str(exc.exception),
+            "Argument 'exempt' must be a set"
         )
 
 

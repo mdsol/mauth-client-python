@@ -28,7 +28,11 @@ class MAuthASGIMiddleware:
     def __init__(self, app: ASGI3Application, exempt: set = set()) -> None:
         self._validate_configs()
         self.app = app
-        self.exempt = exempt
+
+        if not isinstance(exempt, set):
+            raise TypeError("Argument 'exempt' must be a set")
+
+        self.exempt = exempt.copy()
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
