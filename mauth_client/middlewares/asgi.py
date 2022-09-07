@@ -8,7 +8,7 @@ from asgiref.typing import (
     ASGISendCallable,
     Scope,
 )
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from mauth_client.authenticator import LocalAuthenticator
 from mauth_client.config import Config
@@ -25,14 +25,10 @@ logger = logging.getLogger("mauth_asgi")
 
 
 class MAuthASGIMiddleware:
-    def __init__(self, app: ASGI3Application, exempt: set = set()) -> None:
+    def __init__(self, app: ASGI3Application, exempt: Optional[set] = None) -> None:
         self._validate_configs()
         self.app = app
-
-        if not isinstance(exempt, set):
-            raise TypeError("Argument 'exempt' must be a set")
-
-        self.exempt = exempt.copy()
+        self.exempt = exempt.copy() if exempt else set()
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable

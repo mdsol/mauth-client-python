@@ -71,14 +71,6 @@ class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
             "MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION"
         )
 
-    def test_exempt_arg_not_a_set(self):
-        with self.assertRaises(TypeError) as exc:
-            self.app.add_middleware(MAuthASGIMiddleware, exempt=None)
-        self.assertEqual(
-            str(exc.exception),
-            "Argument 'exempt' must be a set"
-        )
-
 
 class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
     def setUp(self):
