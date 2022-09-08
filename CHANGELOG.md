@@ -1,3 +1,7 @@
+# 1.3.0
+- Add `MAuthASGIMiddleware` for authenticating requests in ASGI frameworks like FastAPI.
+- Remove Support for EOL Python 3.6
+
 # 1.2.3
 - Ignore `boto3` import error (`ModuleNotFoundError`).
 

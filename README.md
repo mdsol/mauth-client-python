@@ -114,22 +114,16 @@ app_uuid = authenticator.get_app_uuid()
 
 #### Flask applications
 
-You will need to create an application instance and initialize it with FlaskAuthenticator:
+You will need to create an application instance and initialize it with `FlaskAuthenticator`.
+To specify routes that need to be authenticated use the `requires_authentication` decorator.
 
 ```python
 from flask import Flask
-from mauth_client.flask_authenticator import FlaskAuthenticator
+from mauth_client.flask_authenticator import FlaskAuthenticator, requires_authentication
 
 app = Flask("Some Sample App")
 authenticator = FlaskAuthenticator()
 authenticator.init_app(app)
-```
-
-To specify routes that need to be authenticated use the `requires_authentication` decorator:
-
-```python
-from flask import Flask
-from mauth_client.flask_authenticator import requires_authentication
 
 @app.route("/some/private/route", methods=["GET"])
 @requires_authentication
@@ -141,6 +135,38 @@ def app_status():
     return "OK"
 ```
 
+#### ASGI applications
+
+To apply to an ASGI application you should use the `MAuthASGIMiddleware`. You
+can make certain paths exempt from authentication by passing the `exempt`
+option with a set of paths to exempt.
+
+Here is an example for FastAPI. Note that requesting app's UUID and the
+protocol version will be added to the ASGI `scope` for successfully
+authenticated requests.
+
+```python
+from fastapi import FastAPI, Request
+from mauth_client.constants import ENV_APP_UUID, ENV_PROTOCOL_VERSION
+from mauth_client.middlewares import MAuthASGIMiddleware
+
+app = FastAPI()
+app.add_middleware(MAuthASGIMiddleware, exempt={"/app_status"})
+
+@app.get("/")
+async def root(request: Request):
+    return {
+        "msg": "authenticated",
+        "app_uuid": request.scope[ENV_APP_UUID],
+        "protocol_version": request.scope[ENV_PROTOCOL_VERSION],
+    }
+
+@app.get("/app_status")
+async def app_status():
+    return {
+        "msg": "this route is exempt from authentication",
+    }
+```
 
 ## Contributing
 
