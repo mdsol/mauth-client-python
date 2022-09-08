@@ -147,7 +147,7 @@ authenticated requests.
 
 ```python
 from fastapi import FastAPI, Request
-from mauth_client.constants import ENV_APP_UUID, ENV_PROTOCOL_VERSION
+from mauth_client.consts import ENV_APP_UUID, ENV_PROTOCOL_VERSION
 from mauth_client.middlewares import MAuthASGIMiddleware
 
 app = FastAPI()
