@@ -1,3 +1,7 @@
+# 1.4.0
+- Add `MAuthWSGIMiddleware` for authenticating requests in WSGI frameworks like Flask.
+- Remove `FlaskAuthenticator`.
+
 # 1.3.0
 - Add `MAuthASGIMiddleware` for authenticating requests in ASGI frameworks like FastAPI.
 - Remove Support for EOL Python 3.6
