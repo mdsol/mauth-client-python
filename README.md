@@ -112,30 +112,37 @@ authentic, status_code, message = authenticator.is_authentic()
 app_uuid = authenticator.get_app_uuid()
 ```
 
-#### Flask applications
+#### WSGI Applications
 
-You will need to create an application instance and initialize it with `FlaskAuthenticator`.
-To specify routes that need to be authenticated use the `requires_authentication` decorator.
+To apply to a WSGI application you should use the `MAuthWSGIMiddleware`. You
+can make certain paths exempt from authentication by passing the `exempt`
+option with a set of paths to exempt.
+
+Here is an example for Flask. Note that requesting app's UUID and the
+protocol version will be added to the request environment for successfully
+authenticated requests.
 
 ```python
-from flask import Flask
-from mauth_client.flask_authenticator import FlaskAuthenticator, requires_authentication
+from flask import Flask, request, jsonify
+from mauth_client.consts import ENV_APP_UUID, ENV_PROTOCOL_VERSION
+from mauth_client.middlewares import MAuthWSGIMiddleware
 
-app = Flask("Some Sample App")
-authenticator = FlaskAuthenticator()
-authenticator.init_app(app)
+app = Flask("MyApp")
+app.wsgi_app = MAuthWSGIMiddleware(app.wsgi_app, exempt={"/app_status"})
 
-@app.route("/some/private/route", methods=["GET"])
-@requires_authentication
-def private_route():
-    return "Wibble"
+@app.get("/")
+def root():
+    return jsonify({
+        "msg": "authenticated",
+        "app_uuid": request.environ[ENV_APP_UUID],
+        "protocol_version": request.environ[ENV_PROTOCOL_VERSION],
+    })
 
-@app.route("/app_status", methods=["GET"])
-def app_status():
-    return "OK"
+@app.get("/app_status")
+    return "this route is exempt from authentication"
 ```
 
-#### ASGI applications
+#### ASGI Applications
 
 To apply to an ASGI application you should use the `MAuthASGIMiddleware`. You
 can make certain paths exempt from authentication by passing the `exempt`
@@ -147,7 +154,7 @@ authenticated requests.
 
 ```python
 from fastapi import FastAPI, Request
-from mauth_client.constants import ENV_APP_UUID, ENV_PROTOCOL_VERSION
+from mauth_client.consts import ENV_APP_UUID, ENV_PROTOCOL_VERSION
 from mauth_client.middlewares import MAuthASGIMiddleware
 
 app = FastAPI()
