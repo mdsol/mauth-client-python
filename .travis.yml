@@ -9,8 +9,8 @@ python:
   - 3.10
 
 before_install:
-  - pip install poetry==1.1.15 # latest poetry 1.1.20 was having problems with travis
-  - pip install tox-travis
+  - pip install poetry==1.4.2
+  - pip install tox==3.28.0 tox-travis # 3.28.0 is the latest version supported by tox-travis
 
 install: poetry install -v
 
