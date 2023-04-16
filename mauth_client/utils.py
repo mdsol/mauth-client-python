@@ -1,5 +1,5 @@
 import base64
-import cchardet
+import charset_normalizer
 from hashlib import sha512
 
 
@@ -30,5 +30,5 @@ def decode(byte_string: bytes) -> str:
     try:
         return byte_string.decode("utf-8")
     except UnicodeDecodeError:
-        encoding = cchardet.detect(byte_string)["encoding"]
+        encoding = charset_normalizer.detect(byte_string)["encoding"]
         return byte_string.decode(encoding)
