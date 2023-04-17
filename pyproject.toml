@@ -41,7 +41,7 @@ pytest-freezegun = "^0.4"
 pytest-randomly = "^3.11"
 pytest-subtests = "^0.10"
 flake8 = "^3.7"
-tox = "^4.4"
+tox = "^3.28"
 fastapi = "^0.80.0"
 
 [tool.black]
