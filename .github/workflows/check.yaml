@@ -6,23 +6,23 @@ on:
 
 jobs:
   lint:
-    name: Lint
+    name: 🧹 Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Install poetry
         run: pipx install poetry==1.4.2
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.11"
           cache: 'poetry'
       - name: Install dependencies
         run: poetry install --no-interaction
       - run: poetry run flake8
 
   test:
-    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+    name: 🧪 ${{ matrix.os }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.image }}
     strategy:
       matrix:

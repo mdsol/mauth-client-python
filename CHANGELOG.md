@@ -1,3 +1,6 @@
+# 1.5.0
+- Replace `cchardet` with `charset-normalizer` to support Python 3.11
+
 # 1.4.0
 - Add `MAuthWSGIMiddleware` for authenticating requests in WSGI frameworks like Flask.
 - Remove `FlaskAuthenticator`.
