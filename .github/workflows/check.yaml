@@ -1,0 +1,55 @@
+name: Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry==1.4.2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: 'poetry'
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - run: poetry run flake8
+
+  test:
+    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+    runs-on: ${{ matrix.image }}
+    strategy:
+      matrix:
+        os: [Ubuntu, macOS, Windows]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        include:
+          - os: Ubuntu
+            image: ubuntu-latest
+          - os: Windows
+            image: windows-latest
+          - os: macOS
+            image: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install poetry
+        run: pipx install poetry==1.4.2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        id: python-setup
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+      - name: Set poetry environment
+        run: poetry env use ${{ steps.python-setup.outputs.python-path }}
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - run: poetry run pytest

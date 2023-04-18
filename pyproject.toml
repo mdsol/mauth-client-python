@@ -22,11 +22,11 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7.13"
+python = "^3.7"
 requests = "^2.23"
-cachetools = "^4.1"
+cachetools = "^5.3"
 rsa = "^4.0"
-importlib-metadata = {version = "^3.6", python = "<3.8"}
+importlib-metadata = {version = ">=3.6", python = "<3.8"}
 asgiref = "^3.5.2"
 cchardet = "^2.1.7"
 
@@ -35,13 +35,13 @@ boto3 = "^1.24"
 flask = "^2"
 python-dateutil = "^2.8"
 requests-mock = "^1.7"
-pytest = "^6"
-pytest-cov = "^2.8"
+pytest = "^7"
+pytest-cov = "^4"
 pytest-freezegun = "^0.4"
 pytest-randomly = "^3.11"
-pytest-subtests = "^0.3"
+pytest-subtests = "^0.10"
 flake8 = "^3.7"
-tox = "^3.22.0"
+tox = "^3.28"
 fastapi = "^0.80.0"
 
 [tool.black]
