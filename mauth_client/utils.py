@@ -25,7 +25,7 @@ def base64_encode(signature):
 
 def decode(byte_string: bytes) -> str:
     """
-    Attempt to decode a byte string with utf and fallback to cchardet.
+    Attempt to decode a byte string with utf and fallback to charset_normalizer.
     """
     try:
         return byte_string.decode("utf-8")
