@@ -1,3 +1,6 @@
+# 1.5.1
+- Fix `MAuthWSGIMiddleware` to no longer depend on `werkzeug` data in the request env.
+
 # 1.5.0
 - Replace `cchardet` with `charset-normalizer` to support Python 3.11
 
