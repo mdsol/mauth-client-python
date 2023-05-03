@@ -98,11 +98,7 @@ class MAuthWSGIMiddleware:
             url_parts.append(environ["SERVER_NAME"])
             port = environ["SERVER_PORT"]
 
-            if (
-                (scheme == "https" and port != 443)
-                or
-                (scheme != "https" and port != 80)
-            ):
+            if (scheme == "https" and port != 443) or (scheme != "https" and port != 80):
                 url_parts.append(f":{port}")
 
         url_parts.append(quote(environ.get("SCRIPT_NAME", "")))
