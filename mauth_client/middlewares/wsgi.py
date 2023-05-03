@@ -1,6 +1,8 @@
 import json
 import logging
 
+from urllib.parse import quote
+
 from mauth_client.authenticator import LocalAuthenticator
 from mauth_client.config import Config
 from mauth_client.consts import (
@@ -22,17 +24,17 @@ class MAuthWSGIMiddleware:
         self.exempt = exempt.copy() if exempt else set()
 
     def __call__(self, environ, start_response):
-        req = environ["werkzeug.request"]
+        path = environ.get("PATH_INFO", "")
 
-        if req.path in self.exempt:
+        if path in self.exempt:
             return self.app(environ, start_response)
 
         signable = RequestSignable(
-            method=req.method,
-            url=req.url,
+            method=environ["REQUEST_METHOD"],
+            url=self._extract_url(environ),
             body=self._read_body(environ),
         )
-        signed = Signed.from_headers(dict(req.headers))
+        signed = Signed.from_headers(self._extract_headers(environ))
         authenticator = LocalAuthenticator(signable, signed, logger)
         is_authentic, status, message = authenticator.is_authentic()
 
@@ -60,3 +62,54 @@ class MAuthWSGIMiddleware:
         body = input.read()
         input.seek(0)
         return body
+
+    def _extract_headers(self, environ):
+        """
+        Adapted from werkzeug package: https://github.com/pallets/werkzeug
+        """
+        headers = {}
+
+        # don't care to titleize the header keys since
+        # the Signed class is just going to lowercase them
+        for k, v in environ.items():
+            if k.startswith("HTTP_") and k not in {
+                "HTTP_CONTENT_TYPE",
+                "HTTP_CONTENT_LENGTH",
+            }:
+                key = k[5:].replace("_", "-")
+                headers[key] = v
+            elif k in {"CONTENT_TYPE", "CONTENT_LENGTH"}:
+                key = k.replace("_", "-")
+                headers[key] = v
+
+        return headers
+
+    def _extract_url(self, environ):
+        """
+        Adapted from https://peps.python.org/pep-0333/#url-reconstruction
+        """
+        scheme = environ["wsgi.url_scheme"]
+        url_parts = [scheme, "://"]
+        http_host = environ.get("HTTP_HOST")
+
+        if http_host:
+            url_parts.append(http_host)
+        else:
+            url_parts.append(environ["SERVER_NAME"])
+            port = environ["SERVER_PORT"]
+
+            if (
+                (scheme == "https" and port != 443)
+                or
+                (scheme != "https" and port != 80)
+            ):
+                url_parts.append(f":{port}")
+
+        url_parts.append(quote(environ.get("SCRIPT_NAME", "")))
+        url_parts.append(quote(environ.get("PATH_INFO"), ""))
+
+        qs = environ.get("QUERY_STRING")
+        if qs:
+            url_parts.append(f"?{qs}")
+
+        return "".join(url_parts)
