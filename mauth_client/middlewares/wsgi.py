@@ -84,6 +84,8 @@ class MAuthWSGIMiddleware:
 
         return headers
 
+    SAFE_CHARS = "!$&'()*+,/:;=@%"
+
     def _extract_url(self, environ):
         """
         Adapted from https://peps.python.org/pep-0333/#url-reconstruction
@@ -101,11 +103,15 @@ class MAuthWSGIMiddleware:
             if (scheme == "https" and port != 443) or (scheme != "https" and port != 80):
                 url_parts.append(f":{port}")
 
-        url_parts.append(quote(environ.get("SCRIPT_NAME", "")))
-        url_parts.append(quote(environ.get("PATH_INFO"), ""))
+        url_parts.append(
+            quote(environ.get("SCRIPT_NAME", ""), safe=self.SAFE_CHARS)
+        )
+        url_parts.append(
+            quote(environ.get("PATH_INFO", ""), safe=self.SAFE_CHARS)
+        )
 
         qs = environ.get("QUERY_STRING")
         if qs:
-            url_parts.append(f"?{qs}")
+            url_parts.append(f"?{quote(qs, safe=self.SAFE_CHARS)}")
 
         return "".join(url_parts)
