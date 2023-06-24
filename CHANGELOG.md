@@ -1,3 +1,7 @@
+# 1.6.0
+- Fix bug with reading request body in `MAuthWSGIMiddleware`.
+- Remove Support for EOL Python 3.7
+
 # 1.5.1
 - Fix `MAuthWSGIMiddleware` to no longer depend on `werkzeug` data in the request env.
 
