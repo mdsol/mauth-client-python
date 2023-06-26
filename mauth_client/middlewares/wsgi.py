@@ -47,7 +47,6 @@ class MAuthWSGIMiddleware:
 
         return self._send_response(code, message, start_response)
 
-
     def _validate_configs(self):
         # Validate the client settings (APP_UUID, PRIVATE_KEY)
         if not all([Config.APP_UUID, Config.PRIVATE_KEY]):
