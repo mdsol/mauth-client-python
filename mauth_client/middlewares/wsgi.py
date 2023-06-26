@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 
@@ -57,10 +58,29 @@ class MAuthWSGIMiddleware:
             raise TypeError("MAuthWSGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION")
 
     def _read_body(self, environ):
-        input = environ["wsgi.input"]
-        input.seek(0)
-        body = input.read()
-        input.seek(0)
+        try:
+            size = int(environ.get("CONTENT_LENGTH", 0))
+        except ValueError:
+            size = 0
+
+        if not size:
+            return b""
+
+        body = environ["wsgi.input"].read(size)
+
+        # hack way of "rewinding" body so that downstream can reuse
+        #
+        # seek() will not work because production Flask and gunicorn give
+        # objects without a seek() function and blow up...
+        # yet humorously Flask in our tests gives a normal BytesIO object
+        # that does have seek()
+        #
+        # NOTE:
+        # this will not play well with large bodies where this may result in
+        # blowing out memory, but tbh MAuth is not adequately designed for and
+        # thus should not be used with large bodies.
+        environ["wsgi.input"] = io.BytesIO(body)
+
         return body
 
     def _extract_headers(self, environ):
