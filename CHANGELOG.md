@@ -1,3 +1,7 @@
+# 1.6.1
+- Fix `MAuthWSGIMiddleware` to return a string for "status" and to properly set
+  content-length header.
+
 # 1.6.0
 - Fix bug with reading request body in `MAuthWSGIMiddleware`.
 - Remove Support for EOL Python 3.7

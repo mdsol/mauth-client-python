@@ -37,7 +37,7 @@ class MAuthWSGIMiddleware:
         )
         signed = Signed.from_headers(self._extract_headers(environ))
         authenticator = LocalAuthenticator(signable, signed, logger)
-        is_authentic, status, message = authenticator.is_authentic()
+        is_authentic, code, message = authenticator.is_authentic()
 
         if is_authentic:
             environ[ENV_APP_UUID] = signed.app_uuid
@@ -45,9 +45,7 @@ class MAuthWSGIMiddleware:
             environ[ENV_PROTOCOL_VERSION] = signed.protocol_version()
             return self.app(environ, start_response)
 
-        start_response(status, [("content-type", "application/json")])
-        body = {"errors": {"mauth": [message]}}
-        return [json.dumps(body).encode("utf-8")]
+        return self._send_response(code, message, start_response)
 
     def _validate_configs(self):
         # Validate the client settings (APP_UUID, PRIVATE_KEY)
@@ -135,3 +133,21 @@ class MAuthWSGIMiddleware:
             url_parts.append(f"?{quote(qs, safe=self.SAFE_CHARS)}")
 
         return "".join(url_parts)
+
+    _STATUS_STRS = {
+        401: "401 Unauthorized",
+        500: "500 Internal Server Error",
+    }
+
+    def _send_response(self, code, msg, start_response):
+        status = self._STATUS_STRS[code]
+        body = {"errors": {"mauth": [msg]}}
+        body_bytes = json.dumps(body).encode("utf-8")
+
+        headers = [
+            ("Content-Type", "application/json"),
+            ("Content-Length", str(len(body_bytes))),
+        ]
+        start_response(status, headers)
+
+        return [body_bytes]
