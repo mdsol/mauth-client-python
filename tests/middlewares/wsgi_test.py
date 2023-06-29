@@ -99,6 +99,7 @@ class TestMAuthWSGIMiddlewareFunctionality(unittest.TestCase):
         response = self.client.get("/")
 
         self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.headers["Content-Length"], "151")
         self.assertEqual(response.json, {
             "errors": {
                 "mauth": [(
