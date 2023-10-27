@@ -179,3 +179,39 @@ class TestMAuthASGIMiddlewareFunctionality(unittest.TestCase):
         with self.client.websocket_connect("/ws") as websocket:
             data = websocket.receive_json()
             self.assertEqual(data, {"msg": "helloes"})
+
+
+class TestMAuthASGIMiddlewareInSubApplication(unittest.TestCase):
+    def setUp(self):
+        self.app_uuid = str(uuid4())
+        Config.APP_UUID = self.app_uuid
+        Config.MAUTH_URL = "https://mauth.com"
+        Config.MAUTH_API_VERSION = "v1"
+        Config.PRIVATE_KEY = "key"
+
+        self.app = FastAPI()
+        sub_app = FastAPI()
+        sub_app.add_middleware(MAuthASGIMiddleware)
+
+        @sub_app.get("/path")
+        async def sub_app_path():
+            return {"msg": "sub app path"}
+
+        self.app.mount("/sub_app", sub_app)
+
+        self.client = TestClient(self.app)
+
+    @patch.object(LocalAuthenticator, "is_authentic", autospec=True)
+    def test_includes_base_application_path_in_signature_verification(self, is_authentic_mock):
+        request_url = None
+
+        def is_authentic_effect(self):
+            nonlocal request_url
+            request_url = self.signable.attributes_for_signing["request_url"]
+            return True, 200, ""
+
+        is_authentic_mock.side_effect = is_authentic_effect
+
+        self.client.get("/sub_app/path")
+
+        self.assertEqual(request_url, "/sub_app/path")

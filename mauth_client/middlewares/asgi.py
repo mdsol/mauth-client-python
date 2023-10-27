@@ -38,8 +38,9 @@ class MAuthASGIMiddleware:
         if scope["type"] != "http" or path in self.exempt:
             return await self.app(scope, receive, send)
 
+        root_path = scope["root_path"]
         query_string = scope["query_string"]
-        url = f"{path}?{decode(query_string)}" if query_string else path
+        url = f"{root_path}{path}?{decode(query_string)}" if query_string else f"{root_path}{path}"
         headers = {decode(k): decode(v) for k, v in scope["headers"]}
 
         events, body = await self._get_body(receive)
