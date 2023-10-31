@@ -1,3 +1,7 @@
+# 1.6.2
+- Fix `MAuthASGIMiddleware` signature validation when the full URL path is split
+  between `root_path` and `path` in the request scope.
+
 # 1.6.1
 - Fix `MAuthWSGIMiddleware` to return a string for "status" and to properly set
   content-length header.
