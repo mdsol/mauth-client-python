@@ -32,6 +32,7 @@ class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
     def test_app_configuration(self):
         try:
             self.app.add_middleware(MAuthASGIMiddleware)
+            self.app.build_middleware_stack()
         except TypeError:
             self.fail("Shouldn't raise exception")
 
@@ -39,6 +40,7 @@ class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
         Config.APP_UUID = None
         with self.assertRaises(TypeError) as exc:
             self.app.add_middleware(MAuthASGIMiddleware)
+            self.app.build_middleware_stack()
         self.assertEqual(
             str(exc.exception),
             "MAuthASGIMiddleware requires APP_UUID and PRIVATE_KEY"
@@ -48,6 +50,7 @@ class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
         Config.PRIVATE_KEY = None
         with self.assertRaises(TypeError) as exc:
             self.app.add_middleware(MAuthASGIMiddleware)
+            self.app.build_middleware_stack()
         self.assertEqual(
             str(exc.exception),
             "MAuthASGIMiddleware requires APP_UUID and PRIVATE_KEY"
@@ -57,6 +60,7 @@ class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
         Config.MAUTH_URL = None
         with self.assertRaises(TypeError) as exc:
             self.app.add_middleware(MAuthASGIMiddleware)
+            self.app.build_middleware_stack()
         self.assertEqual(
             str(exc.exception),
             "MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION"
@@ -66,6 +70,7 @@ class TestMAuthASGIMiddlewareInitialization(unittest.TestCase):
         Config.MAUTH_API_VERSION = None
         with self.assertRaises(TypeError) as exc:
             self.app.add_middleware(MAuthASGIMiddleware)
+            self.app.build_middleware_stack()
         self.assertEqual(
             str(exc.exception),
             "MAuthASGIMiddleware requires MAUTH_URL and MAUTH_API_VERSION"
