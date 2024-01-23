@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mauth-client"
-version = "1.6.2"
+version = "1.6.3"
 description = "MAuth Client for Python"
 repository = "https://github.com/mdsol/mauth-client-python"
 authors = ["Medidata Solutions <support@mdsol.com>"]
@@ -41,7 +41,8 @@ pytest-randomly = "^3.11"
 pytest-subtests = "^0.10"
 flake8 = "^3.7"
 tox = "^3.28"
-fastapi = "^0.80.0"
+fastapi = "^0.109.0"
+httpx = "^0.26.0"
 
 [tool.black]
 line-length = 120
