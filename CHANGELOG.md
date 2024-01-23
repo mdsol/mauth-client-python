@@ -1,3 +1,7 @@
+# 1.6.3
+- Revert change introduced in v1.6.2 now that Starlette has been updated to
+  always include `root_path` in `path`.
+
 # 1.6.2
 - Fix `MAuthASGIMiddleware` signature validation when the full URL path is split
   between `root_path` and `path` in the request scope.
