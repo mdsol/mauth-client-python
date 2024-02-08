@@ -33,9 +33,11 @@ class MAuthASGIMiddleware:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        path = scope["path"]
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
 
-        if scope["type"] != "http" or path in self.exempt:
+        path = scope["path"]
+        if path in self.exempt:
             return await self.app(scope, receive, send)
 
         query_string = scope["query_string"]
