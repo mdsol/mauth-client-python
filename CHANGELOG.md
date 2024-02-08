@@ -1,3 +1,8 @@
+# 1.6.4
+- Fix `MAuthASGIMiddleware` when accessing `path` when `path` is not set yet.
+  This appears to only happen on startup.
+- Replace the character `\n` on one-liner private keys.
+
 # 1.6.3
 - Revert change introduced in v1.6.2 now that Starlette has been updated to
   always include `root_path` in `path`.

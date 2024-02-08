@@ -20,4 +20,4 @@ def _get_private_key():
         except ModuleNotFoundError:
             pass
 
-    return private_key.replace(" ", "\n").replace("\nRSA\nPRIVATE\nKEY", " RSA PRIVATE KEY")
+    return private_key.replace("\\n", "\n").replace(" ", "\n").replace("\nRSA\nPRIVATE\nKEY", " RSA PRIVATE KEY")
