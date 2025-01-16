@@ -41,12 +41,12 @@ class ProtocolTestSuiteHelper:
 class ProtocolTestSuiteParser:
     def __init__(self, case_path):
         self.case_name = os.path.basename(case_path)
-        self.request_attributes = self.request_attributes(case_path)
+        self.request_attributes = self.build_request_attributes(case_path)
         self.sts = self.read_file_by_extension(case_path, "sts")
         self.sig = self.read_file_by_extension(case_path, "sig")
         self.auth_headers = self.read_json_by_extension(case_path, "authz")
 
-    def request_attributes(self, case_path):
+    def build_request_attributes(self, case_path):
         req = self.read_json_by_extension(case_path, "req")
         body_file_path = os.path.join(case_path, req["body_filepath"]) if "body_filepath" in req else ""
         body = self.read_file(body_file_path, "rb") if body_file_path else req.get("body")
