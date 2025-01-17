@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from freezegun import freeze_time
 from mauth_client.signable import RequestSignable
@@ -7,7 +7,7 @@ from mauth_client.signer import Signer
 
 APP_UUID = "5ff4257e-9c16-11e0-b048-0026bbfffe5e"
 EPOCH = "1309891855"  # 2011-07-05 18:50:00 UTC
-EPOCH_DATETIME = datetime.fromtimestamp(float(EPOCH))
+EPOCH_DATETIME = datetime.fromtimestamp(float(EPOCH), timezone.utc)
 REQUEST_ATTRIBUTES = {"method": "GET", "url": "https://example.org/studies/123/users?k=v"}
 ADDITIONAL_ATTRIBUTES = {"app_uuid": APP_UUID, "time": EPOCH}
 
@@ -40,7 +40,7 @@ class SignerTest(unittest.TestCase):
             "MCC-Time": EPOCH,
         }
 
-        signed_headers = self.signer.signed_headers(self.signable, ADDITIONAL_ATTRIBUTES)
+        signed_headers = self.signer.signed_headers(self.signable)
         self.assertEqual(signed_headers.keys(), expected.keys())
         self.assertRegex(signed_headers["X-MWS-Authentication"], expected["X-MWS-Authentication"])
         self.assertRegex(signed_headers["MCC-Authentication"], expected["MCC-Authentication"])
@@ -51,7 +51,7 @@ class SignerTest(unittest.TestCase):
     def test_signed_headers_v1_only(self):
         expected = {"X-MWS-Authentication": r"\AMWS {}:".format(APP_UUID), "X-MWS-Time": EPOCH}
 
-        signed_headers = self.signer_v1_only.signed_headers(self.signable, ADDITIONAL_ATTRIBUTES)
+        signed_headers = self.signer_v1_only.signed_headers(self.signable)
         self.assertEqual(signed_headers.keys(), expected.keys())
         self.assertRegex(signed_headers["X-MWS-Authentication"], expected["X-MWS-Authentication"])
         self.assertEqual(signed_headers["X-MWS-Time"], expected["X-MWS-Time"])
@@ -60,7 +60,7 @@ class SignerTest(unittest.TestCase):
     def test_signed_headers_v2_only(self):
         expected = {"MCC-Authentication": r"MWSV2 {}:[^;]*;".format(APP_UUID), "MCC-Time": EPOCH}
 
-        signed_headers = self.signer_v2_only.signed_headers(self.signable, ADDITIONAL_ATTRIBUTES)
+        signed_headers = self.signer_v2_only.signed_headers(self.signable)
         self.assertEqual(signed_headers.keys(), expected.keys())
         self.assertRegex(signed_headers["MCC-Authentication"], expected["MCC-Authentication"])
         self.assertEqual(signed_headers["MCC-Time"], expected["MCC-Time"])

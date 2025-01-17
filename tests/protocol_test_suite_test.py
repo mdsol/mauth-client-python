@@ -27,7 +27,7 @@ class ProtocolTestSuiteTest(unittest.TestCase):
         for case_path in TEST_SUITE.cases():
             parser = ProtocolTestSuiteParser(case_path)
             request_signable = RequestSignable(**parser.request_attributes)
-            signed_headers_v2 = TEST_SUITE.signer.signed_headers_v2(request_signable, TEST_SUITE.additional_attributes)
+            signed_headers_v2 = TEST_SUITE.signer.signed_headers_v2(request_signable)
             if "authentication-only" not in case_path:
                 with self.subTest(test="string_to_sign_v2", case_name=parser.case_name):
                     string_to_sign = request_signable.string_to_sign_v2(TEST_SUITE.additional_attributes)

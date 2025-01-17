@@ -1,7 +1,7 @@
 # file to handle loading and parsing of mauth protocol test suite cases in order
 # to run them as unit tests
 
-from datetime import datetime
+from datetime import datetime, timezone
 import glob
 import os
 import json
@@ -29,7 +29,7 @@ class ProtocolTestSuiteHelper:
         with open(os.path.join(MAUTH_PROTOCOL_DIR, "signing-params/rsa-key-pub"), "r") as key_file:
             self.public_key = key_file.read()
 
-        self.request_time = datetime.fromtimestamp(float(config["request_time"]))
+        self.request_time = datetime.fromtimestamp(float(config["request_time"]), timezone.utc)
         self.app_uuid = config["app_uuid"]
         self.signer = Signer(config["app_uuid"], private_key, "v2")
         self.additional_attributes = {"app_uuid": config["app_uuid"], "time": config["request_time"]}
@@ -41,12 +41,12 @@ class ProtocolTestSuiteHelper:
 class ProtocolTestSuiteParser:
     def __init__(self, case_path):
         self.case_name = os.path.basename(case_path)
-        self.request_attributes = self.request_attributes(case_path)
+        self.request_attributes = self.build_request_attributes(case_path)
         self.sts = self.read_file_by_extension(case_path, "sts")
         self.sig = self.read_file_by_extension(case_path, "sig")
-        self.auth_headers = self.read_json_by_extension(case_path, "authz")
+        self.auth_headers = {k: str(v) for k, v in self.read_json_by_extension(case_path, "authz").items()}
 
-    def request_attributes(self, case_path):
+    def build_request_attributes(self, case_path):
         req = self.read_json_by_extension(case_path, "req")
         body_file_path = os.path.join(case_path, req["body_filepath"]) if "body_filepath" in req else ""
         body = self.read_file(body_file_path, "rb") if body_file_path else req.get("body")
