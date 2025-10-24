@@ -1,3 +1,6 @@
+# 1.6.6
+- Support long-lived connections in ASGI middleware
+
 # 1.6.5
 - Resolved dependabot identified security issues
 - Removed build status icon from travis (not used for CI any longer)
