@@ -1,9 +1,9 @@
 import unittest
-from unittest.mock import patch
-
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 from fastapi.websockets import WebSocket
+from unittest.mock import AsyncMock
+from unittest.mock import patch
 from uuid import uuid4
 
 from mauth_client.authenticator import LocalAuthenticator
@@ -220,3 +220,61 @@ class TestMAuthASGIMiddlewareInSubApplication(unittest.TestCase):
         self.client.get("/sub_app/path")
 
         self.assertEqual(request_url, "/sub_app/path")
+
+
+class TestMAuthASGIMiddlewareInLongLivedConnections(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.app = FastAPI()
+        Config.APP_UUID = str(uuid4())
+        Config.MAUTH_URL = "https://mauth.com"
+        Config.MAUTH_API_VERSION = "v1"
+        Config.PRIVATE_KEY = "key"
+
+    @patch.object(LocalAuthenticator, "is_authentic")
+    async def test_fake_receive_delegates_to_original_after_body_consumed(self, is_authentic_mock):
+        """Test that after body events are consumed, _fake_receive delegates to original receive"""
+        is_authentic_mock.return_value = (True, 200, "")
+
+        # Track that original receive was called after body events exhausted
+        call_order = []
+
+        async def mock_app(scope, receive, send):
+            # First receive should get body event
+            event1 = await receive()
+            call_order.append(("body", event1["type"]))
+
+            # Second receive should delegate to original receive
+            event2 = await receive()
+            call_order.append(("disconnect", event2["type"]))
+
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            await send({"type": "http.response.body", "body": b""})
+
+        middleware = MAuthASGIMiddleware(mock_app)
+
+        # Mock receive that returns body then disconnect
+        receive_calls = 0
+
+        async def mock_receive():
+            nonlocal receive_calls
+            receive_calls += 1
+            if receive_calls == 1:
+                return {"type": "http.request", "body": b"test", "more_body": False}
+            return {"type": "http.disconnect"}
+
+        send_mock = AsyncMock()
+        scope = {
+            "type": "http",
+            "method": "POST",
+            "path": "/test",
+            "query_string": b"",
+            "headers": []
+        }
+
+        await middleware(scope, mock_receive, send_mock)
+
+        # Verify events were received in correct order
+        self.assertEqual(len(call_order), 2)
+        self.assertEqual(call_order[0], ("body", "http.request"))
+        self.assertEqual(call_order[1], ("disconnect", "http.disconnect"))
+        self.assertEqual(receive_calls, 2)  # Called once for auth, once from app
