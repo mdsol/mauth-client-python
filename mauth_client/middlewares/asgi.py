@@ -62,7 +62,7 @@ class MAuthASGIMiddleware:
             scope_copy[ENV_APP_UUID] = signed.app_uuid
             scope_copy[ENV_AUTHENTIC] = True
             scope_copy[ENV_PROTOCOL_VERSION] = signed.protocol_version()
-            await self.app(scope_copy, self._fake_receive(events), send)
+            await self.app(scope_copy, self._fake_receive(events, receive), send)
         else:
             await self._send_response(send, status, message)
 
@@ -100,12 +100,18 @@ class MAuthASGIMiddleware:
             "body": json.dumps(body).encode("utf-8"),
         })
 
-    def _fake_receive(self, events: List[ASGIReceiveEvent]) -> ASGIReceiveCallable:
+    def _fake_receive(self, events: List[ASGIReceiveEvent],
+                      original_receive: ASGIReceiveCallable) -> ASGIReceiveCallable:
         """
-        Create a fake, async receive function using an iterator of the events
-        we've already read. This will be passed to downstream middlewares/apps
-        instead of the usual receive fn, so that they can also "receive" the
-        body events.
+        Create a fake receive function that replays cached body events.
+
+        After the middleware consumes request body events for authentication,
+        this allows downstream apps to also "receive" those events. Once all
+        cached events are exhausted, delegates to the original receive to
+        properly forward lifecycle events (like http.disconnect).
+
+        This is essential for long-lived connections (SSE, streaming responses)
+        that need to detect client disconnects.
         """
         events_iter = iter(events)
 
@@ -113,5 +119,7 @@ class MAuthASGIMiddleware:
             try:
                 return next(events_iter)
             except StopIteration:
-                pass
+                # After body events are consumed, delegate to original receive
+                # This allows proper handling of disconnects for SSE connections
+                return await original_receive()
         return _receive
