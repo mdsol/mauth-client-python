@@ -154,3 +154,19 @@ class TestIsExemptRequestPath(unittest.TestCase):
         self.assertTrue(is_exempt_request_path("/status/app", exempt))
         self.assertTrue(is_exempt_request_path("/actuator/health", exempt))
         self.assertFalse(is_exempt_request_path("/api/metrics", exempt))
+
+    def test_long_nested_paths(self):
+        """Test deeply nested paths with multiple levels."""
+        exempt = {"/api"}
+        # Test very long nested paths
+        self.assertTrue(is_exempt_request_path("/api/v1/organizations/123/projects/456/resources/789/items", exempt))
+        self.assertTrue(is_exempt_request_path("/api/internal/admin/users/settings/preferences/notifications", exempt))
+
+        exempt_nested = {"/admin/dashboard"}
+        self.assertTrue(is_exempt_request_path(
+            "/admin/dashboard/analytics/reports/monthly/2024/november/summary",
+            exempt_nested
+        ))
+
+        # Should not match similar but non-matching long paths
+        self.assertFalse(is_exempt_request_path("/api-v1/dashboard-v2/analytics", exempt_nested))
