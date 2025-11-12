@@ -192,3 +192,79 @@ class TestMAuthWSGIMiddlewareFunctionality(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, body)
+
+
+class TestMAuthWSGIMiddlewareWithPrefixMatch(unittest.TestCase):
+    def setUp(self):
+        self.app_uuid = str(uuid4())
+        Config.APP_UUID = self.app_uuid
+        Config.MAUTH_URL = "https://mauth.com"
+        Config.MAUTH_API_VERSION = "v1"
+        Config.PRIVATE_KEY = "key"
+
+        self.app = Flask("Test App")
+        self.app.wsgi_app = MAuthWSGIMiddleware(
+            self.app.wsgi_app,
+            exempt={"/health", "/metrics"},
+            exempt_prefix_match=True
+        )
+
+        @self.app.get("/")
+        def root():
+            return "authenticated!"
+
+        @self.app.get("/health")
+        def health_exact():
+            return "exact health"
+
+        @self.app.get("/health/live")
+        def health_live():
+            return "health live"
+
+        @self.app.get("/health/ready")
+        def health_ready():
+            return "health ready"
+
+        @self.app.get("/metrics/prometheus")
+        def metrics():
+            return "metrics"
+
+        @self.app.get("/api/health")
+        def api_health():
+            return "api health"
+
+        self.client = self.app.test_client()
+
+    def test_prefix_match_allows_nested_paths(self):
+        """Test that nested paths under exempt prefix are allowed"""
+        response = self.client.get("/health/live")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_data(as_text=True), "health live")
+
+        response = self.client.get("/health/ready")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_data(as_text=True), "health ready")
+
+        response = self.client.get("/metrics/prometheus")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_data(as_text=True), "metrics")
+
+    def test_prefix_match_blocks_similar_paths(self):
+        """Test that similar but non-matching paths are still blocked"""
+        response = self.client.get("/api/health")
+        self.assertEqual(response.status_code, 401)
+
+    def test_prefix_match_allows_exact_match_in_exempt_set(self):
+        """Test that exact match in exempt set is allowed (from exact match check)"""
+        response = self.client.get("/health")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_data(as_text=True), "exact health")
+
+    @patch.object(LocalAuthenticator, "is_authentic")
+    def test_prefix_match_still_authenticates_non_exempt_paths(self, is_authentic_mock):
+        """Test that non-exempt paths still require authentication"""
+        is_authentic_mock.return_value = (True, 200, "")
+
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_data(as_text=True), "authenticated!")
