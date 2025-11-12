@@ -1,3 +1,6 @@
+# 1.6.7
+- Added optional substring exempt path matching when `exempt_prefix_match` is `True`
+
 # 1.6.6
 - Support long-lived connections in ASGI middleware
 

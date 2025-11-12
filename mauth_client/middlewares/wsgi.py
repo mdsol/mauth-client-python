@@ -14,20 +14,25 @@ from mauth_client.consts import (
 
 from mauth_client.signable import RequestSignable
 from mauth_client.signed import Signed
+from mauth_client.utils import is_exempt_request_path
 
 logger = logging.getLogger("mauth_wsgi")
 
 
 class MAuthWSGIMiddleware:
-    def __init__(self, app, exempt=None):
+    def __init__(self, app, exempt=None, exempt_prefix_match=False):
         self._validate_configs()
         self.app = app
         self.exempt = exempt.copy() if exempt else set()
+        self.exempt_prefix_match = exempt_prefix_match
 
     def __call__(self, environ, start_response):
         path = environ.get("PATH_INFO", "")
 
         if path in self.exempt:
+            return self.app(environ, start_response)
+
+        if self.exempt_prefix_match and is_exempt_request_path(path, self.exempt):
             return self.app(environ, start_response)
 
         signable = RequestSignable(

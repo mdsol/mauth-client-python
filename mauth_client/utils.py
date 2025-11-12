@@ -32,3 +32,11 @@ def decode(byte_string: bytes) -> str:
     except UnicodeDecodeError:
         encoding = charset_normalizer.detect(byte_string)["encoding"]
         return byte_string.decode(encoding)
+
+def is_exempt_request_path(path: str, exempt: set) -> bool:
+    for exempt_path in exempt:
+        # Exact match or prefix match with path separator
+        # For instance this prevents /api matching /api-admin or /app_status matching /app_status_admin
+        if path.startswith(exempt_path.rstrip('/') + '/'):
+            return True
+    return False
