@@ -41,6 +41,8 @@ mauth-client==<latest version>
 
 ### Signing Outgoing Requests
 
+#### With [Requests library](https://requests.readthedocs.io/en/latest/)
+
 ```python
 import requests
 from mauth_client.requests_mauth import MAuth
@@ -64,6 +66,21 @@ if result.status_code == 200:
 print(result.text)
 ```
 
+#### With [HTTPX](https://www.python-httpx.org/) library
+
+```python
+import httpx
+from mauth_client.httpx_mauth import MAuthHttpx
+
+# MAuth configuration
+APP_UUID = "<MAUTH_APP_UUID>"
+private_key = open("private.key", "r").read()
+
+auth = MAuthHttpx(app_uuid=APP_UUID, private_key_data=private_key)
+client = httpx.Client(auth=auth)
+response = client.get("https://api.example.com/endpoint")
+```
+
 The `mauth_sign_versions` option can be set as an environment variable to specify protocol versions to sign outgoing requests:
 
 | Key                   | Value                                                                                |
@@ -75,6 +92,8 @@ This option can also be passed to the constructor:
 ```python
 mauth_sign_versions = "v1,v2"
 mauth = MAuth(APP_UUID, private_key, mauth_sign_versions)
+
+auth = MAuthHttpx(app_uuid=APP_UUID, private_key_data=private_key, sign_versions=mauth_sign_versions)
 ```
 
 

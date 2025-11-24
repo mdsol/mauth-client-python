@@ -1,3 +1,7 @@
+# 1.7.0
+- Add `MAuthHttpx` custom authentication scheme for HTTPX.
+- Remove Support for EOL Python 3.8
+
 # 1.6.6
 - Support long-lived connections in ASGI middleware
 
