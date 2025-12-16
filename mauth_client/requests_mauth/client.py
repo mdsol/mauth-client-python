@@ -9,7 +9,12 @@ class MAuth(requests.auth.AuthBase):
     Custom requests authorizer for MAuth
     """
 
-    def __init__(self, app_uuid, private_key_data, sign_versions=Config.SIGN_VERSIONS):
+    def __init__(
+        self,
+        app_uuid=Config.APP_UUID,
+        private_key_data=Config.PRIVATE_KEY,
+        sign_versions=Config.SIGN_VERSIONS
+    ):
         """
         Create a new MAuth Instance
 

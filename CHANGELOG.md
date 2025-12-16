@@ -1,3 +1,7 @@
+# 1.8.0
+- Add `to_rsa_format` function to normalize private key
+- Update requests_mauth and httpx_mauth to support reading configuration from environment variables
+
 # 1.7.0
 - Add `MAuthHttpx` custom authentication scheme for HTTPX.
 - Remove Support for EOL Python 3.8

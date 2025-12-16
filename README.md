@@ -81,6 +81,13 @@ client = httpx.Client(auth=auth)
 response = client.get("https://api.example.com/endpoint")
 ```
 
+The following variables can be configured in the environment variables:
+
+| Key                                  | Value                              |
+| ------------------------------------ | ---------------------------------- |
+| `APP_UUID` or `MAUTH_APP_UUID`       | APP_UUID for signing requests      |
+| `PRIVATE_KEY` or `MAUTH_PRIVATE_KEY` | MAuth private key for the APP_UUID |
+
 The `mauth_sign_versions` option can be set as an environment variable to specify protocol versions to sign outgoing requests:
 
 | Key                   | Value                                                                                |
@@ -103,11 +110,11 @@ MAuth Client Python supports AWS Lambda functions and Flask applications to auth
 
 The following variables are **required** to be configured in the environment variables:
 
-| Key            | Value                                                         |
-| -------------- | ------------------------------------------------------------- |
-| `APP_UUID`     | APP_UUID for the AWS Lambda function                          |
-| `PRIVATE_KEY`  | Encrypted private key for the APP_UUID                        |
-| `MAUTH_URL`    | MAuth service URL (e.g. https://mauth-innovate.imedidata.com) |
+| Key                                  | Value                                                         |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `APP_UUID` or `MAUTH_APP_UUID`       | APP_UUID for the AWS Lambda function                          |
+| `PRIVATE_KEY` or `MAUTH_PRIVATE_KEY` | Encrypted private key for the APP_UUID                        |
+| `MAUTH_URL`                          | MAuth service URL (e.g. https://mauth-innovate.imedidata.com) |
 
 
 The following variables can optionally be set in the environment variables:
