@@ -15,8 +15,8 @@ class MAuthHttpx(httpx.Auth):
 
     def __init__(
         self,
-        app_uuid: str,
-        private_key_data: str,
+        app_uuid: str = Config.APP_UUID,
+        private_key_data: str = Config.PRIVATE_KEY,
         sign_versions: str = Config.SIGN_VERSIONS,
     ):
         self.signer = Signer(app_uuid, private_key_data, sign_versions)
