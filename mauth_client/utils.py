@@ -1,6 +1,10 @@
 import base64
 import charset_normalizer
+import re
 from hashlib import sha512
+
+HEADER = '-----BEGIN RSA PRIVATE KEY-----'
+FOOTER = '-----END RSA PRIVATE KEY-----'
 
 
 def make_bytes(val):
@@ -32,3 +36,21 @@ def decode(byte_string: bytes) -> str:
     except UnicodeDecodeError:
         encoding = charset_normalizer.detect(byte_string)["encoding"]
         return byte_string.decode(encoding)
+
+
+def to_rsa_format(key: str) -> str:
+    """Convert a private key to RSA format with proper newlines."""
+
+    if "\n" in key:
+        return key
+
+    body = key.strip()
+    body = body.replace(HEADER, "").replace(FOOTER, "").strip()
+
+    # Replace whitespace with newlines or chunk into 64-char lines
+    if " " in body or "\t" in body:
+        body = re.sub(r'\s+', '\n', body)
+    else:
+        body = '\n'.join(body[i:i + 64] for i in range(0, len(body), 64))
+
+    return f"{HEADER}\n{body}\n{FOOTER}"
