@@ -41,7 +41,7 @@ def decode(byte_string: bytes) -> str:
 def to_rsa_format(key: str) -> str:
     """Convert a private key to RSA format with proper newlines."""
 
-    if "\n" in key:
+    if "\n" in key and HEADER in key and FOOTER in key:
         return key
 
     body = key.strip()
