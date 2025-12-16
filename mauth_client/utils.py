@@ -51,6 +51,7 @@ def to_rsa_format(key: str) -> str:
     if " " in body or "\t" in body:
         body = re.sub(r'\s+', '\n', body)
     else:
+        # PEM-encoded keys are typically split into lines of 64 characters as per RFC 7468 (section 2)
         body = '\n'.join(body[i:i + 64] for i in range(0, len(body), 64))
 
     return f"{HEADER}\n{body}\n{FOOTER}"
