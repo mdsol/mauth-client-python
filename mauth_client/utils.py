@@ -3,7 +3,7 @@ import charset_normalizer
 import re
 from hashlib import sha512
 
-PEM_BOUNDARY_RE = re.compile(r"^-----(?:BEGIN|END) ([A-Za-z0-9 -]+)-----$", re.MULTILINE)
+PEM_BOUNDARY_RE = re.compile(r"-----(?:BEGIN|END) ([A-Za-z0-9 -]+?)-----")
 
 
 def make_bytes(val):
