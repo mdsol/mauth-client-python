@@ -7,6 +7,8 @@ import rsa
 from .utils import make_bytes, hexdigest
 from pyasn1.codec.der import decoder
 
+RSA_ALGORITHM_OID = "1.2.840.113549.1.1.1"
+
 
 class RSASigner:
     """
@@ -25,18 +27,21 @@ class RSASigner:
         try:
             return rsa.PrivateKey.load_pkcs1(private_key_data, "PEM")
         except ValueError:
-            return RSASigner.load_pkcs8_private_key(private_key_data)
+            try:
+                return RSASigner.load_pkcs8_private_key(private_key_data)
+            except ValueError as pkcs8_error:
+                raise ValueError("Unable to load private key as PKCS#1 or PKCS#8 PEM") from pkcs8_error
 
     @staticmethod
     def load_pkcs8_private_key(private_key_data):
         private_key_der = rsa.pem.load_pem(private_key_data, "PRIVATE KEY")
-        private_key_info, _ = decoder.decode(private_key_der)
+        pkcs8_structure, _ = decoder.decode(private_key_der)
 
-        algorithm = str(private_key_info[1][0])
-        if algorithm != "1.2.840.113549.1.1.1":
-            raise ValueError("Only RSA private keys are supported")
+        algorithm = str(pkcs8_structure[1][0])
+        if algorithm != RSA_ALGORITHM_OID:
+            raise ValueError(f"Expected RSA algorithm OID {RSA_ALGORITHM_OID}, but got: {algorithm}")
 
-        return rsa.PrivateKey.load_pkcs1(bytes(private_key_info[2]), "DER")
+        return rsa.PrivateKey.load_pkcs1(bytes(pkcs8_structure[2]), "DER")
 
     def sign_v2(self, string_to_sign):
         """Signs the data using SHA512 for V2 protocol

@@ -141,6 +141,6 @@ class SignerTest(unittest.TestCase):
             str(exc.exception), "SIGN_VERSIONS must be comma-separated MAuth protocol versions (e.g. 'v1,v2')"
         )
 
-    def test_signature_pkcs8_private_key(self):
+    def test_pkcs8_and_pkcs1_signatures_match(self):
         self.assertEqual(self.signer_pkcs8.signature_v1("Hello world"), self.signer.signature_v1("Hello world"))
         self.assertEqual(self.signer_pkcs8.signature_v2("Hello world"), self.signer.signature_v2("Hello world"))
