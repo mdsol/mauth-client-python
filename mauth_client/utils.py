@@ -45,7 +45,12 @@ def decode(byte_string: bytes) -> str:
 
 
 def to_rsa_format(key: str) -> str:
-    """Convert a private key to RSA format with proper newlines."""
+    """Normalize a private key PEM string with proper newlines.
+
+    Supports both PKCS#1 (``-----BEGIN RSA PRIVATE KEY-----``) and
+    PKCS#8 (``-----BEGIN PRIVATE KEY-----``) PEM formats, preserving
+    the original header and footer markers.
+    """
 
     header, footer = next(
         ((hdr, ftr) for hdr, ftr in SUPPORTED_PRIVATE_KEY_FORMATS if hdr in key and ftr in key),
