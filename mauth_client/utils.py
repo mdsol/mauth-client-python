@@ -5,6 +5,12 @@ from hashlib import sha512
 
 HEADER = '-----BEGIN RSA PRIVATE KEY-----'
 FOOTER = '-----END RSA PRIVATE KEY-----'
+PKCS8_HEADER = '-----BEGIN PRIVATE KEY-----'
+PKCS8_FOOTER = '-----END PRIVATE KEY-----'
+SUPPORTED_PRIVATE_KEY_FORMATS = (
+    (HEADER, FOOTER),
+    (PKCS8_HEADER, PKCS8_FOOTER),
+)
 
 
 def make_bytes(val):
@@ -41,11 +47,16 @@ def decode(byte_string: bytes) -> str:
 def to_rsa_format(key: str) -> str:
     """Convert a private key to RSA format with proper newlines."""
 
-    if "\n" in key and HEADER in key and FOOTER in key:
+    header, footer = next(
+        ((hdr, ftr) for hdr, ftr in SUPPORTED_PRIVATE_KEY_FORMATS if hdr in key and ftr in key),
+        (HEADER, FOOTER),
+    )
+
+    if "\n" in key and header in key and footer in key:
         return key
 
     body = key.strip()
-    body = body.replace(HEADER, "").replace(FOOTER, "").strip()
+    body = body.replace(header, "").replace(footer, "").strip()
 
     # Replace whitespace with newlines or chunk into 64-char lines
     if " " in body or "\t" in body:
@@ -54,4 +65,4 @@ def to_rsa_format(key: str) -> str:
         # PEM-encoded keys are typically split into lines of 64 characters as per RFC 7468 (section 2)
         body = '\n'.join(body[i:i + 64] for i in range(0, len(body), 64))
 
-    return f"{HEADER}\n{body}\n{FOOTER}"
+    return f"{header}\n{body}\n{footer}"

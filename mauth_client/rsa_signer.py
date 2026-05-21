@@ -5,6 +5,7 @@
 
 import rsa
 from .utils import make_bytes, hexdigest
+from pyasn1.codec.der import decoder
 
 
 class RSASigner:
@@ -16,7 +17,26 @@ class RSASigner:
         """
         :param private_key_data:
         """
-        self.private_key = rsa.PrivateKey.load_pkcs1(private_key_data, "PEM")
+        self.private_key = self.load_private_key(private_key_data)
+
+    @staticmethod
+    def load_private_key(private_key_data):
+        private_key_data = make_bytes(private_key_data)
+        try:
+            return rsa.PrivateKey.load_pkcs1(private_key_data, "PEM")
+        except ValueError:
+            return RSASigner.load_pkcs8_private_key(private_key_data)
+
+    @staticmethod
+    def load_pkcs8_private_key(private_key_data):
+        private_key_der = rsa.pem.load_pem(private_key_data, "PRIVATE KEY")
+        private_key_info, _ = decoder.decode(private_key_der)
+
+        algorithm = str(private_key_info[1][0])
+        if algorithm != "1.2.840.113549.1.1.1":
+            raise ValueError("Only RSA private keys are supported")
+
+        return rsa.PrivateKey.load_pkcs1(bytes(private_key_info[2]), "DER")
 
     def sign_v2(self, string_to_sign):
         """Signs the data using SHA512 for V2 protocol

@@ -8,7 +8,7 @@ def load_key(keytype="pub"):
     :return: key content
     :rtype: str
     """
-    assert keytype in ("pub", "rsapub", "priv")
+    assert keytype in ("pub", "rsapub", "priv", "pkcs8")
     content = ""
     with open(
         os.path.join(os.path.dirname(__file__), "keys", "fake_mauth.{}.key".format(keytype)), "r"
