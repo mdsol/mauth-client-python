@@ -1,3 +1,6 @@
+# 1.9.0
+- Add support for PKCS#8 private key format
+
 # 1.8.0
 - Add `to_rsa_format` function to normalize private key
 - Update requests_mauth and httpx_mauth to support reading configuration from environment variables
