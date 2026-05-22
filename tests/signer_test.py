@@ -25,7 +25,10 @@ class SignerTest(unittest.TestCase):
     def setUp(self):
         with open(os.path.join(os.path.dirname(__file__), "keys", "fake_mauth.priv.key"), "r") as key_file:
             self.private_key = key_file.read()
+        with open(os.path.join(os.path.dirname(__file__), "keys", "fake_mauth.pkcs8.key"), "r") as key_file:
+            self.private_key_pkcs8 = key_file.read()
         self.signer = Signer(APP_UUID, self.private_key, "v1,v2")
+        self.signer_pkcs8 = Signer(APP_UUID, self.private_key_pkcs8, "v1,v2")
         self.signer_v1_only = Signer(APP_UUID, self.private_key, "v1")
         self.signer_v2_only = Signer(APP_UUID, self.private_key, "v2")
         self.signable = RequestSignable(**REQUEST_ATTRIBUTES)
@@ -137,3 +140,7 @@ class SignerTest(unittest.TestCase):
         self.assertEqual(
             str(exc.exception), "SIGN_VERSIONS must be comma-separated MAuth protocol versions (e.g. 'v1,v2')"
         )
+
+    def test_pkcs8_and_pkcs1_signatures_match(self):
+        self.assertEqual(self.signer_pkcs8.signature_v1("Hello world"), self.signer.signature_v1("Hello world"))
+        self.assertEqual(self.signer_pkcs8.signature_v2("Hello world"), self.signer.signature_v2("Hello world"))
