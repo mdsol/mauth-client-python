@@ -1,3 +1,6 @@
+# 1.10.0
+- Add support for Python 3.14
+
 # 1.9.0
 - Add support for PKCS#8 private key format
 
