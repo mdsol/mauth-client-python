@@ -1,4 +1,16 @@
+import sys
 import unittest
+
+import pytest
+
+# fastapi/pydantic pull in pydantic-core, which has no compiled wheel for PyPy,
+# so the import itself fails before the skipif marker can take effect.
+if hasattr(sys, "pypy_version_info"):
+    pytest.skip(
+        "FastAPI/Pydantic ASGI tests are not supported reliably on PyPy in CI",
+        allow_module_level=True,
+    )
+
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 from fastapi.websockets import WebSocket

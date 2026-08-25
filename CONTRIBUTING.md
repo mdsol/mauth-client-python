@@ -1,9 +1,8 @@
 # Contributing
 
-We use [travis](https://travis-ci.org) for automated CI of the code (and status checks are required to pass prior to PR merges being accepted).
-We use travis to deploy updated versions to PyPI (only from `master`)
+GitHub Actions runs the automated checks for pull requests and publishes releases to PyPI.
 
-For local development (cross version) we use [tox](http://tox.readthedocs.io/en/latest/) with [pyenv](https://github.com/pyenv/pyenv) to automate the running of unit tests against different python versions in virtualised python environments.
+For local development, install the dependencies with Poetry and run the unit tests with pytest. The test suite runs against all supported Python versions in CI.
 
 ## Installation
 
@@ -14,7 +13,7 @@ To setup your environment:
   brew update
   brew install pyenv
   ```
-1. Install your favorite Python version (>= 3.8 please!)
+1. Install your favorite Python version (>= 3.10 please!)
   ```bash
   pyenv install <YOUR_FAVORITE_VERSION>
   ```
@@ -43,6 +42,6 @@ to init the submodule.
 
 ## Unit Tests
 
-1. Make any changes, update the tests and then run tests with `poetry run tox`.
+1. Make any changes, update the tests and then run tests with `poetry run pytest`.
 1. Coverage report can be viewed using `open htmlcov/index.html`.
-1. Or if you don't care about tox, just run `poetry run pytest` or `poetry run pytest <SOME_FILE>`.
+1. To run a specific test file, use `poetry run pytest <SOME_FILE>`.

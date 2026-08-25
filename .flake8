@@ -10,6 +10,5 @@ exclude =
     dist
     releases
     .venv
-    .tox
     .pytest_cache
     .eggs
