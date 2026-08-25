@@ -42,9 +42,8 @@ pytest-freezer = "^0.4"
 pytest-randomly = "^4.1.0"
 pytest-subtests = "^0.15.0"
 flake8 = "^7.3.0"
-fastapi = "^0.141.1"
+fastapi = { version = "^0.141.1", markers = "platform_python_implementation != 'PyPy'" }
 httpx = "^0.28.1"
-httpx2 = "^2.12.0"
 
 [tool.black]
 line-length = 120
