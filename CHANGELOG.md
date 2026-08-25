@@ -1,5 +1,7 @@
 # 1.10.0
 - Add support for Python 3.14
+- Remove Support for EOL Python 3.9
+- Remove tox in favor of running pytest directly with Poetry and the GitHub Actions Python version matrix.
 
 # 1.9.0
 - Add support for PKCS#8 private key format
