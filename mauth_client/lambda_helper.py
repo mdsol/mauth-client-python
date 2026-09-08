@@ -1,8 +1,10 @@
 from base64 import b64decode
 from mauth_client.config import Config
 from mauth_client.requests_mauth import MAuth
+from mauth_client.utils import to_rsa_format
 
-RSA_PRIVATE_KEY = "RSA PRIVATE KEY"
+# Present in both the PKCS#1 ("RSA PRIVATE KEY") and PKCS#8 ("PRIVATE KEY") PEM markers.
+PRIVATE_KEY_MARKER = "PRIVATE KEY"
 
 
 def generate_mauth():
@@ -11,7 +13,10 @@ def generate_mauth():
 
 def _get_private_key():
     private_key = Config.PRIVATE_KEY
-    if RSA_PRIVATE_KEY not in private_key:
+    if not private_key:
+        return private_key
+
+    if PRIVATE_KEY_MARKER not in private_key:
         try:
             import boto3
 
@@ -20,4 +25,4 @@ def _get_private_key():
         except ModuleNotFoundError:
             pass
 
-    return private_key.replace("\\n", "\n").replace(" ", "\n").replace("\nRSA\nPRIVATE\nKEY", " RSA PRIVATE KEY")
+    return to_rsa_format(private_key)

@@ -6,8 +6,12 @@
 import rsa
 from .utils import make_bytes, hexdigest
 from pyasn1.codec.der import decoder
+from pyasn1.error import PyAsn1Error
 
 RSA_ALGORITHM_OID = "1.2.840.113549.1.1.1"
+# The rsa library lets pyasn1 errors bubble up when the base64 body of a PEM block does not
+# contain valid DER, so both exception types have to be handled while loading a key.
+KEY_LOAD_ERRORS = (ValueError, PyAsn1Error)
 
 
 class RSASigner:
@@ -26,10 +30,10 @@ class RSASigner:
         private_key_data = make_bytes(private_key_data)
         try:
             return rsa.PrivateKey.load_pkcs1(private_key_data, "PEM")
-        except ValueError:
+        except KEY_LOAD_ERRORS:
             try:
                 return RSASigner.load_pkcs8_private_key(private_key_data)
-            except ValueError as pkcs8_error:
+            except KEY_LOAD_ERRORS as pkcs8_error:
                 raise ValueError("Unable to load private key as PKCS#1 or PKCS#8 PEM") from pkcs8_error
 
     @staticmethod
