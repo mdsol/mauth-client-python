@@ -1,3 +1,7 @@
+# 1.10,1
+- Fix key decode error
+- Raise a clear `ValueError` instead of a `pyasn1` error when a private key cannot be loaded
+
 # 1.10.0
 - Add support for Python 3.14
 - Remove Support for EOL Python 3.9
