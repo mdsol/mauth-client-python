@@ -1,4 +1,4 @@
-# 1.10,1
+# 1.10.1
 - Fix key decode error
 - Raise a clear `ValueError` instead of a `pyasn1` error when a private key cannot be loaded
 
